@@ -13,4 +13,7 @@ interface PostRepository {
         latitude: Double,
         longitude: Double
     ): Resource<Unit>
+
+    // YENİ EKLENEN: Tüm postları getir
+    suspend fun getPosts(): Resource<List<io.github.thwisse.kentinsesi.data.model.Post>>
 }

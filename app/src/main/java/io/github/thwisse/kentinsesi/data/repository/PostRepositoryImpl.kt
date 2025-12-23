@@ -67,4 +67,22 @@ class PostRepositoryImpl @Inject constructor(
             Resource.Error(e.message ?: "Post oluşturulurken bilinmeyen bir hata oluştu.")
         }
     }
+
+    override suspend fun getPosts(): Resource<List<Post>> {
+        return try {
+            // "posts" koleksiyonuna git
+            // createdAt tarihine göre tersten sırala (En yeni en üstte)
+            val snapshot = firestore.collection("posts")
+                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .get()
+                .await()
+
+            // Gelen dokümanları Post nesnesine çevir ve listele
+            val postList = snapshot.toObjects(Post::class.java)
+
+            Resource.Success(postList)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Veriler alınırken hata oluştu.")
+        }
+    }
 }

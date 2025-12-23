@@ -10,12 +10,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.thwisse.kentinsesi.R
 import io.github.thwisse.kentinsesi.databinding.FragmentHomeBinding
+import io.github.thwisse.kentinsesi.util.Resource
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -30,12 +33,6 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setupMenu()
     }
 
     private fun setupMenu() {
@@ -62,6 +59,38 @@ class HomeFragment : Fragment() {
                 }
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    // ViewModel ve Adapter tanımları
+    private val viewModel: HomeViewModel by viewModels()
+    private val postAdapter = PostAdapter()
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupRecyclerView()
+        setupMenu()
+        observePosts()
+    }
+
+    private fun setupRecyclerView() {
+        binding.rvPosts.adapter = postAdapter
+    }
+
+    private fun observePosts() {
+        viewModel.postsState.observe(viewLifecycleOwner) { resource ->
+            binding.progressBar.isVisible = resource is Resource.Loading
+
+            when (resource) {
+                is Resource.Success -> {
+                    postAdapter.submitList(resource.data)
+                }
+                is Resource.Error -> {
+                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Loading -> { }
+            }
+        }
     }
 
     override fun onDestroyView() {

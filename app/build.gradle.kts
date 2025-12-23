@@ -67,4 +67,5 @@ dependencies {
     kapt(libs.hilt.compiler)
 
     implementation(libs.play.services.location)
+    implementation(libs.coil)
 }
