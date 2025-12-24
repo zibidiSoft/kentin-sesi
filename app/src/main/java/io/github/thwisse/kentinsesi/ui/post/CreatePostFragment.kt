@@ -38,6 +38,8 @@ class CreatePostFragment : Fragment() {
     private var currentLatitude: Double? = null
     private var currentLongitude: Double? = null
 
+    private var currentDistrict: String? = null // Bulunan ilçe burada tutulacak
+
     // --- GALERİDEN FOTOĞRAF SEÇİCİ ---
     // Modern Android Photo Picker kullanıyoruz
     private val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -78,12 +80,23 @@ class CreatePostFragment : Fragment() {
         // Konum servisini başlat
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
+        setupDistrictSpinner()
         setupCategorySpinner()
         setupClickListeners()
         observeState()
 
         // Ekran açılır açılmaz konumu almaya çalış
         checkLocationPermissionAndGet()
+    }
+
+    private fun setupDistrictSpinner() {
+        val districts = listOf(
+            "Altınözü", "Antakya", "Arsuz", "Belen", "Defne", "Dörtyol",
+            "Erzin", "Hassa", "İskenderun", "Kırıkhan", "Kumlu",
+            "Payas", "Reyhanlı", "Samandağ", "Yayladağı"
+        )
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, districts)
+        binding.actvDistrict.setAdapter(adapter)
     }
 
     private fun setupCategorySpinner() {
@@ -93,32 +106,49 @@ class CreatePostFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        // Fotoğraf alanına tıklayınca galeri aç
+        // Fotoğraf Seçimi
         binding.ivPostImage.setOnClickListener {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
 
+        // Paylaş Butonu
         binding.btnShare.setOnClickListener {
             val title = binding.etTitle.text.toString().trim()
             val description = binding.etDescription.text.toString().trim()
             val category = binding.actvCategory.text.toString().trim()
+            // YENİ: İlçeyi ekrandaki kutucuktan okuyoruz
+            val selectedDistrict = binding.actvDistrict.text.toString().trim()
 
+            // 1. Boş Alan Kontrolü
             if (title.isEmpty() || description.isEmpty() || category.isEmpty()) {
-                Toast.makeText(requireContext(), "Lütfen tüm alanları doldurun", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Lütfen başlık, açıklama ve kategori giriniz.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
+            // 2. İlçe Seçimi Kontrolü
+            if (selectedDistrict.isEmpty() || selectedDistrict == "İlçe Seçiniz") {
+                Toast.makeText(requireContext(), "Lütfen geçerli bir ilçe seçiniz.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // 3. Konum Kontrolü (GPS verisi gelmiş mi?)
             if (currentLatitude == null || currentLongitude == null) {
-                Toast.makeText(requireContext(), "Konum bekleniyor...", Toast.LENGTH_SHORT).show()
-                checkLocationPermissionAndGet() // Tekrar dene
+                Toast.makeText(requireContext(), "Konum bekleniyor... Lütfen bekleyin veya GPS'i kontrol edin.", Toast.LENGTH_SHORT).show()
+                checkLocationPermissionAndGet() // Tekrar denemek için
                 return@setOnClickListener
             }
 
-            // ViewModel'e gönder
-            viewModel.createPost(title, description, category, currentLatitude!!, currentLongitude!!)
+            // 4. ViewModel'e Gönder (Manuel seçilen ilçe ile birlikte)
+            viewModel.createPost(
+                title = title,
+                description = description,
+                category = category,
+                latitude = currentLatitude!!,
+                longitude = currentLongitude!!,
+                district = selectedDistrict // Kullanıcının seçtiği ilçe
+            )
         }
     }
-
     private fun checkLocationPermissionAndGet() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             getCurrentLocation()
@@ -133,14 +163,16 @@ class CreatePostFragment : Fragment() {
         binding.tvLocationInfo.text = "Konum alınıyor..."
 
         try {
-            // Son bilinen konumu değil, güncel konumu isteyelim (Priority.PRIORITY_HIGH_ACCURACY)
-            // Not: Bu basit bir implementation. Gerçek hayatta CancellationToken kullanılabilir.
+            // Yüksek hassasiyetle anlık konumu iste
             fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
                 .addOnSuccessListener { location ->
                     if (location != null) {
+                        // Koordinatları değişkenlere al
                         currentLatitude = location.latitude
                         currentLongitude = location.longitude
-                        binding.tvLocationInfo.text = "Konum: ${location.latitude}, ${location.longitude}"
+
+                        // Ekrana sadece koordinat bilgisi bas
+                        binding.tvLocationInfo.text = "Koordinat alındı: ${location.latitude}, ${location.longitude}"
                     } else {
                         binding.tvLocationInfo.text = "Konum bulunamadı. GPS açık mı?"
                     }
@@ -149,7 +181,8 @@ class CreatePostFragment : Fragment() {
                     binding.tvLocationInfo.text = "Konum hatası: ${it.message}"
                 }
         } catch (e: SecurityException) {
-            // İzin yoksa buraya düşer (zaten kontrol ettik ama IDE kızmasın diye try-catch)
+            // İzin verilmemişse buraya düşer
+            binding.tvLocationInfo.text = "Konum izni yok."
         }
     }
 

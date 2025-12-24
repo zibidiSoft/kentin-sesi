@@ -11,9 +11,14 @@ interface PostRepository {
         description: String,
         category: String,
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        district: String // YENİ
     ): Resource<Unit>
 
     // YENİ EKLENEN: Tüm postları getir
-    suspend fun getPosts(): Resource<List<io.github.thwisse.kentinsesi.data.model.Post>>
+    suspend fun getPosts(
+        district: String? = null,
+        category: String? = null,
+        status: String? = null
+    ): Resource<List<io.github.thwisse.kentinsesi.data.model.Post>>
 }

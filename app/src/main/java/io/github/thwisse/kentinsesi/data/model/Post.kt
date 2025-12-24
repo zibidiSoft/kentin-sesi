@@ -16,6 +16,9 @@ data class Post(
     val imageUrl: String? = null, // Fotoğraf olmayabilir, bu yüzden nullable (?) yaptık
     val location: GeoPoint? = null, // Konum bilgisi olmayabilir (?)
 
+    // YENİ EKLENEN ALAN:
+    val district: String? = null, // Örn: "İskenderun"
+
     @ServerTimestamp // Firestore'a yazarken sunucu saatini otomatik atar, okurken Timestamp döner.
     val createdAt: Timestamp? = null, // İlk başta null olabilir
 

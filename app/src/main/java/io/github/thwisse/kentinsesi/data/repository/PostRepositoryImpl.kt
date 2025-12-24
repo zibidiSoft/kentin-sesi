@@ -23,7 +23,8 @@ class PostRepositoryImpl @Inject constructor(
         description: String,
         category: String,
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        district: String // Parametre eklendi
     ): Resource<Unit> {
         return try {
             // 1. Kullanıcı giriş yapmış mı kontrol et
@@ -40,10 +41,8 @@ class PostRepositoryImpl @Inject constructor(
             // Yükleme işlemini başlat ve bitmesini bekle (.await())
             storageRef.putFile(imageUri).await()
 
-            // 3. Yüklenen fotoğrafın indirme linkini (URL) al
             val downloadUrl = storageRef.downloadUrl.await().toString()
 
-            // 4. Firestore'a kaydedilecek Post nesnesini hazırla
             val newPost = Post(
                 authorId = currentUser.uid,
                 title = title,
@@ -51,34 +50,49 @@ class PostRepositoryImpl @Inject constructor(
                 category = category,
                 imageUrl = downloadUrl,
                 location = GeoPoint(latitude, longitude),
-                status = "new",       // Yeni post varsayılan olarak "yeni" durumundadır
-                upvoteCount = 0,
-                createdAt = null      // Firestore sunucusu burayı otomatik dolduracak (@ServerTimestamp)
+                district = district, // YENİ: Veritabanına yazıyoruz
+                status = "new",
+                upvoteCount = 0
             )
 
-            // 5. Veriyi Firestore 'posts' koleksiyonuna ekle
             firestore.collection("posts").add(newPost).await()
-
-            // İşlem başarılı
             Resource.Success(Unit)
-
         } catch (e: Exception) {
-            e.printStackTrace()
-            Resource.Error(e.message ?: "Post oluşturulurken bilinmeyen bir hata oluştu.")
+            Resource.Error(e.message ?: "Hata")
         }
     }
 
-    override suspend fun getPosts(): Resource<List<Post>> {
+    override suspend fun getPosts(
+        district: String?,
+        category: String?,
+        status: String?
+    ): Resource<List<Post>> {
         return try {
-            // "posts" koleksiyonuna git
-            // createdAt tarihine göre tersten sırala (En yeni en üstte)
-            val snapshot = firestore.collection("posts")
-                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
-                .get()
-                .await()
+            // Temel sorgu: 'posts' koleksiyonu
+            var query = firestore.collection("posts") as com.google.firebase.firestore.Query
 
-            // Gelen dokümanları Post nesnesine çevir ve listele
+            // --- İLÇE FİLTRESİ ARTIK ÇALIŞACAK ---
+            if (!district.isNullOrEmpty()) {
+                query = query.whereEqualTo("district", district)
+            }
+            // -------------------------------------
+
+            if (!category.isNullOrEmpty()) {
+                query = query.whereEqualTo("category", category)
+            }
+
+            if (!status.isNullOrEmpty()) {
+                query = query.whereEqualTo("status", status)
+            }
+
+            // Sıralama: En yeni en üstte
+            query = query.orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+
+            val snapshot = query.get().await()
             val postList = snapshot.toObjects(Post::class.java)
+
+            // DİKKAT: Post modelinde "district" alanı yoksa, ilçe filtresini burada (Client-side) yapabiliriz.
+            // Şimdilik sadece kategori ve statü çalışacak.
 
             Resource.Success(postList)
         } catch (e: Exception) {

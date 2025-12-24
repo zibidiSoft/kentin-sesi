@@ -30,7 +30,8 @@ class CreatePostViewModel @Inject constructor(
         description: String,
         category: String,
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        district: String // YENİ
     ) {
         val imageUri = selectedImageUri
         if (imageUri == null) {
@@ -48,7 +49,8 @@ class CreatePostViewModel @Inject constructor(
                 description = description,
                 category = category,
                 latitude = latitude,
-                longitude = longitude
+                longitude = longitude,
+                district = district // YENİ
             )
 
             _createPostState.value = result

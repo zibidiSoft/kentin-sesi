@@ -42,13 +42,29 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilDistrict"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="İlçe Seçiniz"
+        app:layout_constraintTop_toBottomOf="@id/tilTitle">
+
+        <AutoCompleteTextView
+            android:id="@+id/actvDistrict"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:text="İskenderun" /> </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilCategory"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:hint="Kategori"
-        app:layout_constraintTop_toBottomOf="@id/tilTitle">
+        app:layout_constraintTop_toBottomOf="@id/tilDistrict">
 
         <AutoCompleteTextView
             android:id="@+id/actvCategory"

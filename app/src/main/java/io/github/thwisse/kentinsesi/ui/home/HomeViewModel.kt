@@ -24,10 +24,12 @@ class HomeViewModel @Inject constructor(
         getPosts()
     }
 
-    fun getPosts() {
+    // Parametreler varsayılan olarak null (Filtresiz)
+    fun getPosts(district: String? = null, category: String? = null, status: String? = null) {
         viewModelScope.launch {
             _postsState.value = Resource.Loading()
-            val result = postRepository.getPosts()
+            // Filtreleri repository'ye ilet
+            val result = postRepository.getPosts(district, category, status)
             _postsState.value = result
         }
     }

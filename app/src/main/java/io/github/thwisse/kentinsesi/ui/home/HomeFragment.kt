@@ -12,6 +12,7 @@ import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
@@ -51,8 +52,8 @@ class HomeFragment : Fragment() {
                         true
                     }
                     R.id.action_filter -> {
-                        // Filtre butonuna basılınca (Şimdilik Toast gösterelim, sonra BottomSheet yapacağız)
-                        Toast.makeText(requireContext(), "Filtreleme yakında...", Toast.LENGTH_SHORT).show()
+                        // Filtre butonuna basılınca BottomSheet'i aç
+                        findNavController().navigate(R.id.action_homeFragment_to_filterBottomSheetFragment)
                         true
                     }
                     else -> false
@@ -71,6 +72,19 @@ class HomeFragment : Fragment() {
         setupRecyclerView()
         setupMenu()
         observePosts()
+
+        // Filtre ekranından gelen sonuçları dinle
+        setFragmentResultListener("filter_request") { _, bundle ->
+            val district = bundle.getString("district")
+            val category = bundle.getString("category")
+            val status = bundle.getString("status")
+
+            // Listeyi temizle (opsiyonel görsel iyileştirme) veya direkt yüklemeye geç
+            viewModel.getPosts(district, category, status)
+
+            // Kullanıcıya bilgi ver
+            Toast.makeText(requireContext(), "Filtreler uygulandı", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setupRecyclerView() {
