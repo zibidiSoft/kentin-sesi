@@ -104,9 +104,19 @@ class HomeFragment : Fragment() {
     private fun setupRecyclerView() {
         val currentUserId = viewModel.currentUserId
 
-        postAdapter = PostAdapter(currentUserId) { clickedPost ->
-            viewModel.toggleUpvote(clickedPost)
-        }
+        postAdapter = PostAdapter(
+            currentUserId = currentUserId,
+            onUpvoteClick = { clickedPost ->
+                viewModel.toggleUpvote(clickedPost)
+            },
+            onItemClick = { clickedPost ->
+                // Karta tıklandı -> Detay sayfasına git ve veriyi taşı
+                val bundle = android.os.Bundle().apply {
+                    putParcelable("post", clickedPost)
+                }
+                findNavController().navigate(R.id.action_homeFragment_to_postDetailFragment, bundle)
+            }
+        )
 
         binding.rvPosts.adapter = postAdapter
     }

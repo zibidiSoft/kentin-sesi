@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_homeFragment_to_filterBottomSheetFragment"
             app:destination="@id/filterBottomSheetFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_postDetailFragment"
+            app:destination="@id/postDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/nav_map"
@@ -37,6 +40,16 @@
         android:name="io.github.thwisse.kentinsesi.ui.post.CreatePostFragment"
         android:label="Bildirim Oluştur"
         tools:layout="@layout/fragment_create_post" />
+    <fragment
+        android:id="@+id/postDetailFragment"
+        android:name="io.github.thwisse.kentinsesi.ui.post.PostDetailFragment"
+        android:label="Detay"
+        tools:layout="@layout/fragment_post_detail">
+
+        <argument
+            android:name="post"
+            app:argType="io.github.thwisse.kentinsesi.data.model.Post" />
+    </fragment>
     <dialog
         android:id="@+id/filterBottomSheetFragment"
         android:name="io.github.thwisse.kentinsesi.ui.home.FilterBottomSheetFragment"

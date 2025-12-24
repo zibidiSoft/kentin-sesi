@@ -12,7 +12,8 @@ import io.github.thwisse.kentinsesi.databinding.ItemPostBinding
 
 class PostAdapter(
     private val currentUserId: String, // YENİ: Kullanıcı ID'si
-    private val onUpvoteClick: (Post) -> Unit // YENİ: Tıklama Fonksiyonu
+    private val onUpvoteClick: (Post) -> Unit, // YENİ: Tıklama Fonksiyonu,
+    private val onItemClick: (Post) -> Unit
 ) : ListAdapter<Post, PostAdapter.PostViewHolder>(PostDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -66,6 +67,11 @@ class PostAdapter(
                     onUpvoteClick(post)
                 }
                 // -----------------------------
+            }
+
+            // Karta (Root View) tıklayınca detay aç
+            binding.root.setOnClickListener {
+                onItemClick(post)
             }
         }
     }

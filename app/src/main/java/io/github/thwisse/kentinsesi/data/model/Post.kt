@@ -4,7 +4,12 @@ import com.google.firebase.Timestamp // <-- Timestamp için import
 import com.google.firebase.firestore.DocumentId // <-- Firestore ID'si için import
 import com.google.firebase.firestore.GeoPoint // <-- Konum için import
 import com.google.firebase.firestore.ServerTimestamp // <-- Sunucu zaman damgası için import
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
+import java.util.Date
 
+@Parcelize // 1. Bu etiketi ekle
 data class Post(
     val id: String = "", // Firestore Document ID'sini tutmak için gerekli (Eskiden yoktu, ekleyelim)
     @DocumentId // Bu anotasyon, Firestore'un doküman ID'sini bu alana otomatik atamasını sağlar.
@@ -15,19 +20,19 @@ data class Post(
     val description: String = "",
     val category: String = "",
     val imageUrl: String? = null, // Fotoğraf olmayabilir, bu yüzden nullable (?) yaptık
-    val location: GeoPoint? = null, // Konum bilgisi olmayabilir (?)
+    val location: @RawValue GeoPoint? = null, // Konum bilgisi olmayabilir (?)
 
     // YENİ EKLENEN ALAN:
     val district: String? = null, // Örn: "İskenderun"
 
     @ServerTimestamp // Firestore'a yazarken sunucu saatini otomatik atar, okurken Timestamp döner.
-    val createdAt: Timestamp? = null, // İlk başta null olabilir
+    val createdAt: @RawValue Timestamp? = null, // İlk başta null olabilir
 
     val status: String = "new", // Varsayılan durum: yeni
     val upvoteCount: Long = 0,
 
     // YENİ EKLENEN: Bu postu beğenen kullanıcıların ID listesi
     val upvotedBy: List<String> = emptyList(),
-) {
+): Parcelable {
     // Firestore için boş constructor (tüm alanların varsayılan değeri olduğu için otomatik üretilir)
 }
