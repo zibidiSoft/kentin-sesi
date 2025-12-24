@@ -52,8 +52,15 @@ class HomeFragment : Fragment() {
                         true
                     }
                     R.id.action_filter -> {
-                        // Filtre butonuna basılınca BottomSheet'i aç
-                        findNavController().navigate(R.id.action_homeFragment_to_filterBottomSheetFragment)
+                        // Mevcut filtre değerlerini ViewModel'den al
+                        val bundle = android.os.Bundle().apply {
+                            putString("district", viewModel.lastDistrict)
+                            putString("category", viewModel.lastCategory)
+                            putString("status", viewModel.lastStatus)
+                        }
+
+                        // BottomSheet'i bu verilerle aç
+                        findNavController().navigate(R.id.action_homeFragment_to_filterBottomSheetFragment, bundle)
                         true
                     }
                     else -> false

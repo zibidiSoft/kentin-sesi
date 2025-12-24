@@ -27,6 +27,7 @@ class FilterBottomSheetFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupDropdowns()
+        restoreFilters() // YENİ: Eski seçimleri yükle
 
         binding.btnApplyFilter.setOnClickListener {
             // Seçilen değerleri al
@@ -48,6 +49,42 @@ class FilterBottomSheetFragment : BottomSheetDialogFragment() {
             ))
 
             dismiss() // Pencreyi kapat
+        }
+    }
+
+    private fun restoreFilters() {
+        // Gelen verileri oku
+        val district = arguments?.getString("district")
+        val category = arguments?.getString("category")
+        val status = arguments?.getString("status")
+
+        // 1. İlçe Ayarı
+        if (!district.isNullOrEmpty()) {
+            // setText(value, false) kullanıyoruz ki filtreleme tetiklenip liste bozulmasın
+            binding.actvDistrict.setText(district, false)
+        } else {
+            binding.actvDistrict.setText("Tümü", false)
+        }
+
+        // 2. Kategori Ayarı
+        if (!category.isNullOrEmpty()) {
+            binding.actvCategory.setText(category, false)
+        } else {
+            binding.actvCategory.setText("Tümü", false)
+        }
+
+        // 3. Durum Ayarı (Backend kodu -> Ekranda görünen isim dönüşümü)
+        // Backend "new" tutuyor ama ekranda "Yeni" yazıyor. Bunu çevirmeliyiz.
+        if (!status.isNullOrEmpty()) {
+            val displayStatus = when(status) {
+                "new" -> "Yeni"
+                "in_progress" -> "İşlemde"
+                "resolved" -> "Çözüldü"
+                else -> "Tümü"
+            }
+            binding.actvStatus.setText(displayStatus, false)
+        } else {
+            binding.actvStatus.setText("Tümü", false)
         }
     }
 

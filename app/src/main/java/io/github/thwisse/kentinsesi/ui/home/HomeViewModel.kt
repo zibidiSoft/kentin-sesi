@@ -26,9 +26,14 @@ class HomeViewModel @Inject constructor(
         get() = authRepository.currentUser?.uid ?: ""
 
     // Son seçilen filtreleri burada tutacağız
-    private var lastDistrict: String? = null
-    private var lastCategory: String? = null
-    private var lastStatus: String? = null
+    // private var yerine var yapıyoruz.
+    // Dışarıdan okunabilsin ama değiştirilebilsin (set işlemini zaten getPosts içinde yapıyoruz)
+    var lastDistrict: String? = null
+        private set
+    var lastCategory: String? = null
+        private set
+    var lastStatus: String? = null
+        private set
 
     init {
         getPosts()
