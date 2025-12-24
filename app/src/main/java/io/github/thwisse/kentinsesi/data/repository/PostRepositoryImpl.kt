@@ -62,6 +62,34 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun toggleUpvote(postId: String, userId: String): Resource<Unit> {
+        return try {
+            val postRef = firestore.collection("posts").document(postId)
+
+            firestore.runTransaction { transaction ->
+                val snapshot = transaction.get(postRef)
+
+                // Mevcut beğeni listesini ve sayısını al
+                val upvotedBy = snapshot.get("upvotedBy") as? List<String> ?: emptyList()
+                val currentCount = snapshot.getLong("upvoteCount") ?: 0
+
+                if (upvotedBy.contains(userId)) {
+                    // Zaten beğenmiş -> Beğeniyi Geri Al
+                    transaction.update(postRef, "upvotedBy", com.google.firebase.firestore.FieldValue.arrayRemove(userId))
+                    transaction.update(postRef, "upvoteCount", currentCount - 1)
+                } else {
+                    // Henüz beğenmemiş -> Beğeni Ekle
+                    transaction.update(postRef, "upvotedBy", com.google.firebase.firestore.FieldValue.arrayUnion(userId))
+                    transaction.update(postRef, "upvoteCount", currentCount + 1)
+                }
+            }.await()
+
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "İşlem başarısız")
+        }
+    }
+
     override suspend fun getPosts(
         district: String?,
         category: String?,
@@ -89,10 +117,11 @@ class PostRepositoryImpl @Inject constructor(
             query = query.orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
 
             val snapshot = query.get().await()
-            val postList = snapshot.toObjects(Post::class.java)
-
-            // DİKKAT: Post modelinde "district" alanı yoksa, ilçe filtresini burada (Client-side) yapabiliriz.
-            // Şimdilik sadece kategori ve statü çalışacak.
+            // BU KISMI DEĞİŞTİRİYORUZ:
+            val postList = snapshot.documents.map { doc ->
+                val post = doc.toObject(Post::class.java)!!
+                post.copy(id = doc.id) // Doküman ID'sini modele kopyalıyoruz!
+            }
 
             Resource.Success(postList)
         } catch (e: Exception) {

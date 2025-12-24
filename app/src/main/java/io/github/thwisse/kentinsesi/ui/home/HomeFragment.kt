@@ -64,7 +64,7 @@ class HomeFragment : Fragment() {
 
     // ViewModel ve Adapter tanımları
     private val viewModel: HomeViewModel by viewModels()
-    private val postAdapter = PostAdapter()
+    private lateinit var postAdapter: PostAdapter // <-- BUNU EKLE
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -88,6 +88,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
+        val currentUserId = viewModel.currentUserId
+
+        postAdapter = PostAdapter(currentUserId) { clickedPost ->
+            viewModel.toggleUpvote(clickedPost)
+        }
+
         binding.rvPosts.adapter = postAdapter
     }
 

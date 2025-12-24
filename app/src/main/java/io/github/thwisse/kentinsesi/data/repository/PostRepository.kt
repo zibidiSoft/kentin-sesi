@@ -21,4 +21,7 @@ interface PostRepository {
         category: String? = null,
         status: String? = null
     ): Resource<List<io.github.thwisse.kentinsesi.data.model.Post>>
+
+    // Post ID ve Kullanıcı ID alır
+    suspend fun toggleUpvote(postId: String, userId: String): Resource<Unit>
 }

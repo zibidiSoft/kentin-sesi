@@ -96,9 +96,11 @@
 
                     <ImageView
                         android:layout_width="20dp"
+                        android:id="@+id/ivUpvote"
                         android:layout_height="20dp"
                         android:src="@drawable/ic_filter"
-                        app:tint="?attr/colorPrimary" /> <TextView
+                        app:tint="?attr/colorPrimary" />
+                    <TextView
                     android:id="@+id/tvUpvoteCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

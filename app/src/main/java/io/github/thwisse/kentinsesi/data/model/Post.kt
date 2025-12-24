@@ -6,6 +6,7 @@ import com.google.firebase.firestore.GeoPoint // <-- Konum için import
 import com.google.firebase.firestore.ServerTimestamp // <-- Sunucu zaman damgası için import
 
 data class Post(
+    val id: String = "", // Firestore Document ID'sini tutmak için gerekli (Eskiden yoktu, ekleyelim)
     @DocumentId // Bu anotasyon, Firestore'un doküman ID'sini bu alana otomatik atamasını sağlar.
     val postId: String = "",
 
@@ -24,7 +25,9 @@ data class Post(
 
     val status: String = "new", // Varsayılan durum: yeni
     val upvoteCount: Long = 0,
-    val upvotedBy: List<String> = emptyList() // Oy veren kullanıcıların UID listesi
+
+    // YENİ EKLENEN: Bu postu beğenen kullanıcıların ID listesi
+    val upvotedBy: List<String> = emptyList(),
 ) {
     // Firestore için boş constructor (tüm alanların varsayılan değeri olduğu için otomatik üretilir)
 }
