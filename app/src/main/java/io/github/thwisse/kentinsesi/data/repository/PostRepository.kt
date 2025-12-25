@@ -24,4 +24,14 @@ interface PostRepository {
 
     // Post ID ve Kullanıcı ID alır
     suspend fun toggleUpvote(postId: String, userId: String): Resource<Unit>
+
+    // ... diğer fonksiyonların altına ...
+
+    suspend fun getComments(postId: String): Resource<List<io.github.thwisse.kentinsesi.data.model.Comment>>
+
+    suspend fun addComment(postId: String, text: String): Resource<Unit>
+
+    suspend fun updatePostStatus(postId: String, newStatus: String): Resource<Unit>
+    suspend fun deletePost(postId: String): Resource<Unit>
+
 }

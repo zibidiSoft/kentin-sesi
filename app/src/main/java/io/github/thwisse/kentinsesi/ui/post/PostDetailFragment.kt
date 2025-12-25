@@ -1,78 +1,105 @@
 package io.github.thwisse.kentinsesi.ui.post
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
+import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.*
+import dagger.hilt.android.AndroidEntryPoint
 import io.github.thwisse.kentinsesi.data.model.Post
 import io.github.thwisse.kentinsesi.databinding.FragmentPostDetailBinding
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import io.github.thwisse.kentinsesi.util.Resource
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
 
-class PostDetailFragment : Fragment(), OnMapReadyCallback {
+@AndroidEntryPoint
+class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragment_post_detail), OnMapReadyCallback {
 
     private var _binding: FragmentPostDetailBinding? = null
     private val binding get() = _binding!!
 
-    private var postLocation: LatLng? = null // Konumu burada tutacağız
+    // ViewModel Tanımı
+    private val viewModel: PostDetailViewModel by viewModels()
+    private val commentAdapter = CommentAdapter()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentPostDetailBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    private var postLocation: LatLng? = null
+    private var currentPostId: String? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        _binding = FragmentPostDetailBinding.bind(view)
 
-        // Gelen veriyi (Post nesnesini) al
-        // "post" anahtarıyla gönderilen Parcelable nesneyi okuyoruz
         val post = arguments?.getParcelable<Post>("post")
 
         if (post != null) {
+            currentPostId = post.id
             setupViews(post)
+            setupMap(post)
+            setupComments()
 
-            // Konum varsa haritayı hazırla
-            if (post.location != null) {
-                postLocation = LatLng(post.location.latitude, post.location.longitude)
+            // Yorumları Çek
+            viewModel.getComments(post.id)
 
-                // XML'deki fragment'ı bul ve haritayı başlat
-                val mapFragment = childFragmentManager.findFragmentById(io.github.thwisse.kentinsesi.R.id.mapFragment) as? SupportMapFragment
-                mapFragment?.getMapAsync(this)
-            } else {
-                // Konum yoksa harita alanını gizle (Opsiyonel)
-                // binding.mapContainer.isVisible = false gibi...
+            // Yetki Kontrolü ve Menü
+            if (viewModel.currentUserId == post.authorId) {
+                setupOwnerMenu()
             }
         }
 
-        // Geri butonu
-        binding.toolbar.setNavigationIcon(androidx.appcompat.R.drawable.abc_ic_ab_back_material)
-        binding.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
-        }
+        // --- DEĞİŞİKLİK: binding.toolbar kodları SİLİNDİ ---
+        // Geri butonu artık MainActivity'deki setSupportActionBar sayesinde otomatik çalışacak.
+
+        observeOwnerActions()
     }
 
-    // Harita hazır olduğunda burası çalışır
-    override fun onMapReady(googleMap: GoogleMap) {
-        postLocation?.let { location ->
-            // İğne ekle
-            googleMap.addMarker(MarkerOptions().position(location).title("Sorun Konumu"))
+    private fun setupOwnerMenu() {
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: android.view.Menu, menuInflater: android.view.MenuInflater) {
+                menuInflater.inflate(io.github.thwisse.kentinsesi.R.menu.menu_post_detail, menu)
+            }
 
-            // Kamerayı oraya odakla (Zoom seviyesi: 15f)
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
+            override fun onMenuItemSelected(menuItem: android.view.MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    io.github.thwisse.kentinsesi.R.id.action_resolve -> {
+                        currentPostId?.let { viewModel.markAsResolved(it) }
+                        true
+                    }
+                    io.github.thwisse.kentinsesi.R.id.action_delete -> {
+                        currentPostId?.let { viewModel.deletePost(it) }
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
 
-            // Haritaya tıklanınca Google Maps uygulamasını aç (Navigasyon için)
-            googleMap.setOnMapClickListener {
-                // İleride buraya Intent yazıp navigasyon başlatabiliriz
+    private fun observeOwnerActions() {
+        viewModel.deletePostState.observe(viewLifecycleOwner) { resource ->
+            when(resource) {
+                is Resource.Success -> {
+                    Toast.makeText(requireContext(), "Bildirim silindi.", Toast.LENGTH_SHORT).show()
+                    findNavController().navigateUp()
+                }
+                is Resource.Error -> Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
+                is Resource.Loading -> { }
+            }
+        }
+
+        viewModel.updateStatusState.observe(viewLifecycleOwner) { resource ->
+            when(resource) {
+                is Resource.Success -> {
+                    Toast.makeText(requireContext(), "Durum güncellendi: Çözüldü!", Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Error -> Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
+                is Resource.Loading -> { }
             }
         }
     }
@@ -83,10 +110,49 @@ class PostDetailFragment : Fragment(), OnMapReadyCallback {
             tvDetailDescription.text = post.description
             tvDetailCategory.text = post.category
             tvDetailDistrict.text = post.district ?: "İlçe Yok"
+            ivDetailImage.load(post.imageUrl) { crossfade(true) }
+        }
+    }
 
-            ivDetailImage.load(post.imageUrl) {
-                crossfade(true)
+    // ... setupMap, setupComments, onMapReady ve onDestroyView AYNI KALIYOR ...
+    // Sadece yer kaplamasın diye tekrar yazmıyorum, o kısımlarda değişiklik yok.
+
+    private fun setupMap(post: Post) {
+        if (post.location != null) {
+            postLocation = LatLng(post.location.latitude, post.location.longitude)
+            val mapFragment = childFragmentManager.findFragmentById(io.github.thwisse.kentinsesi.R.id.mapFragment) as? SupportMapFragment
+            mapFragment?.getMapAsync(this)
+        }
+    }
+
+    private fun setupComments() {
+        binding.rvComments.apply {
+            adapter = commentAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
+
+        binding.btnSendComment.setOnClickListener {
+            val text = binding.etComment.text.toString().trim()
+            if (text.isNotEmpty() && currentPostId != null) {
+                viewModel.addComment(currentPostId!!, text)
+                binding.etComment.text.clear()
+            } else {
+                Toast.makeText(requireContext(), "Yorum boş olamaz", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        viewModel.commentsState.observe(viewLifecycleOwner) { resource ->
+            if(resource is Resource.Success) commentAdapter.submitList(resource.data)
+        }
+        viewModel.addCommentState.observe(viewLifecycleOwner) {
+            // Hata mesajı vs.
+        }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        postLocation?.let { location ->
+            googleMap.addMarker(MarkerOptions().position(location).title("Sorun Konumu"))
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
         }
     }
 
