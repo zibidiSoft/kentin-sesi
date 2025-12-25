@@ -47,7 +47,11 @@
         android:id="@+id/createPostFragment"
         android:name="io.github.thwisse.kentinsesi.ui.post.CreatePostFragment"
         android:label="Bildirim Oluştur"
-        tools:layout="@layout/fragment_create_post" />
+        tools:layout="@layout/fragment_create_post" >
+        <action
+            android:id="@+id/action_createPostFragment_to_locationPickerFragment"
+            app:destination="@id/locationPickerFragment" />
+    </fragment>
     <fragment
         android:id="@+id/postDetailFragment"
         android:name="io.github.thwisse.kentinsesi.ui.post.PostDetailFragment"
@@ -63,4 +67,9 @@
         android:name="io.github.thwisse.kentinsesi.ui.home.FilterBottomSheetFragment"
         android:label="Filtrele"
         tools:layout="@layout/fragment_filter_bottom_sheet" />
+    <fragment
+        android:id="@+id/locationPickerFragment"
+        android:name="io.github.thwisse.kentinsesi.ui.map.LocationPickerFragment"
+        android:label="fragment_location_picker"
+        tools:layout="@layout/fragment_location_picker" />
 </navigation>

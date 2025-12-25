@@ -116,14 +116,23 @@
                 app:layout_constraintTop_toBottomOf="@id/tilDescription" />
 
             <Button
+                android:id="@+id/btnSelectLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Haritadan Konum Seç"
+                android:backgroundTint="#FF9800"
+                app:icon="@android:drawable/ic_dialog_map"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvLocationInfo" />
+
+            <Button
                 android:id="@+id/btnShare"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="32dp"
                 android:text="Paylaş"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvLocationInfo" />
+                app:layout_constraintTop_toBottomOf="@+id/btnSelectLocation"
+                tools:layout_editor_absoluteX="16dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
