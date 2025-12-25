@@ -24,7 +24,11 @@
         android:id="@+id/nav_map"
         android:name="io.github.thwisse.kentinsesi.ui.map.MapFragment"
         android:label="fragment_map"
-        tools:layout="@layout/fragment_map" />
+        tools:layout="@layout/fragment_map" >
+        <action
+            android:id="@+id/action_nav_map_to_postDetailFragment"
+            app:destination="@id/postDetailFragment" />
+    </fragment>
     <fragment
         android:id="@+id/nav_notifications"
         android:name="io.github.thwisse.kentinsesi.ui.notifications.NotificationsFragment"
