@@ -7,7 +7,7 @@ import com.google.firebase.firestore.ServerTimestamp
 import kotlinx.parcelize.RawValue
 
 /**
- * Post modeli - Vatandaşların oluşturduğu bildirimleri temsil eder
+ * Post modeli - Vatandaşların oluşturduğu paylaşımları temsil eder
  * 
  * ÖNEMLİ: 
  * - Firestore string olarak sakladığı için status'u String olarak tutuyoruz

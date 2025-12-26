@@ -9,7 +9,7 @@
     
     <item
         android:id="@+id/action_delete"
-        android:title="Bu Bildirimi Sil"
+        android:title="Bu Paylaşımı Sil"
         android:titleCondensed="Sil"
         app:showAsAction="never" />
 </menu>

@@ -51,13 +51,16 @@ service cloud.firestore {
       // Güncelleme: 
       // - Post sahibi kendi postunu güncelleyebilir (title, description, category, status)
       // - Yetkili kullanıcılar status'u güncelleyebilir
+      // - Herhangi bir giriş yapmış kullanıcı upvote yapabilir (upvotedBy, upvoteCount)
       allow update: if isAuthenticated() && (
         // Post sahibi belirli alanları güncelleyebilir (status dahil - kendi postunu çözüldü olarak işaretleyebilir)
         (isOwner(resource.data.authorId) && 
          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description', 'category', 'imageUrl', 'status'])) ||
         // Yetkili kullanıcılar sadece status'u güncelleyebilir
         (isOfficial() && 
-         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']))
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])) ||
+        // Herhangi bir giriş yapmış kullanıcı upvote yapabilir (upvotedBy ve upvoteCount)
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotedBy', 'upvoteCount']))
       );
       
       // Silme: Post sahibi veya admin silebilir

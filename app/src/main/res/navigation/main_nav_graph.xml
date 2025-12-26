@@ -49,7 +49,7 @@
     <fragment
         android:id="@+id/createPostFragment"
         android:name="io.github.thwisse.kentinsesi.ui.post.CreatePostFragment"
-        android:label="Bildirim Oluştur"
+        android:label="Paylaşım Oluştur"
         tools:layout="@layout/fragment_create_post" >
         <action
             android:id="@+id/action_createPostFragment_to_locationPickerFragment"

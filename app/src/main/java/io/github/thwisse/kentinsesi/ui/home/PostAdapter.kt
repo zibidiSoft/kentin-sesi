@@ -66,6 +66,13 @@ class PostAdapter(
                 ivUpvote.setOnClickListener {
                     onUpvoteClick(post)
                 }
+                // Upvote butonunun click'ini root view'dan ayır
+                ivUpvote.isClickable = true
+                ivUpvote.isFocusable = true
+                // Upvote butonunun parent'ına da click listener ekle (root view'ın click'ini engellemek için)
+                (ivUpvote.parent as? android.view.View)?.setOnClickListener {
+                    // Boş bırak, sadece root view'ın click'ini engellemek için
+                }
                 // -----------------------------
             }
 

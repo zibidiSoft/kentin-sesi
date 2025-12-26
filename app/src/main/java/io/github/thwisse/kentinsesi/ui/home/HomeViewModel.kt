@@ -61,16 +61,41 @@ class HomeViewModel @Inject constructor(
     // Beğeni (Upvote) Fonksiyonu
     fun toggleUpvote(post: Post) {
         val userId = currentUserId
-        if (userId.isEmpty()) return // Kullanıcı yoksa işlem yapma
+        if (userId.isEmpty()) {
+            android.util.Log.e("HomeViewModel", "toggleUpvote: userId boş")
+            return // Kullanıcı yoksa işlem yapma
+        }
+
+        // Post ID kontrolü - id veya postId kullan
+        // Önce id'yi kontrol et, boşsa postId'yi kullan
+        val postId = when {
+            post.id.isNotEmpty() -> post.id
+            post.postId.isNotEmpty() -> post.postId
+            else -> {
+                android.util.Log.e("HomeViewModel", "toggleUpvote: postId boş - post.id: '${post.id}', post.postId: '${post.postId}'")
+                return // Post ID yoksa işlem yapma
+            }
+        }
+
+        android.util.Log.d("HomeViewModel", "toggleUpvote: postId=$postId, userId=$userId")
 
         viewModelScope.launch {
             // 1. Repository'ye işlemi gönder
-            val result = postRepository.toggleUpvote(post.id, userId)
+            val result = postRepository.toggleUpvote(postId, userId)
 
-            // 2. İşlem başarılıysa listeyi olduğu gibi YENİLE
-            if (result is Resource.Success) {
-                // Hafızadaki son filtrelerle tekrar çağırıyoruz ki ekran bozulmasın
-                getPosts(lastDistrict, lastCategory, lastStatus)
+            // 2. İşlem sonucunu kontrol et
+            when (result) {
+                is Resource.Success -> {
+                    android.util.Log.d("HomeViewModel", "toggleUpvote: Başarılı")
+                    // Hafızadaki son filtrelerle tekrar çağırıyoruz ki ekran bozulmasın
+                    getPosts(lastDistrict, lastCategory, lastStatus)
+                }
+                is Resource.Error -> {
+                    android.util.Log.e("HomeViewModel", "toggleUpvote: Hata - ${result.message}")
+                }
+                is Resource.Loading -> {
+                    android.util.Log.d("HomeViewModel", "toggleUpvote: Loading")
+                }
             }
         }
     }

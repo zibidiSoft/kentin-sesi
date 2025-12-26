@@ -218,7 +218,7 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
         viewModel.deletePostState.observe(viewLifecycleOwner) { resource ->
             when(resource) {
                 is Resource.Success -> {
-                    Toast.makeText(requireContext(), "Bildirim silindi.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Paylaşım silindi.", Toast.LENGTH_SHORT).show()
                     findNavController().navigateUp()
                 }
                 is Resource.Error -> Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
@@ -229,17 +229,17 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
         viewModel.updateStatusState.observe(viewLifecycleOwner) { resource ->
             when(resource) {
                 is Resource.Success -> {
+                    // ViewModel'de post zaten güncellendi, güncel post'u al
                     val updatedPost = viewModel.currentPost.value
-                    val statusText = when (updatedPost?.statusEnum) {
-                        io.github.thwisse.kentinsesi.data.model.PostStatus.NEW -> "Yeni"
-                        io.github.thwisse.kentinsesi.data.model.PostStatus.IN_PROGRESS -> "İşlemde"
-                        io.github.thwisse.kentinsesi.data.model.PostStatus.RESOLVED -> "Çözüldü"
-                        else -> "Güncellendi"
-                    }
-                    Toast.makeText(requireContext(), "Durum güncellendi: $statusText", Toast.LENGTH_SHORT).show()
-                    // Post bilgisini güncelle - ViewModel'den gelen güncel post'u kullan
-                    updatedPost?.let { 
-                        setupViews(it)
+                    updatedPost?.let { post ->
+                        val statusText = when (post.statusEnum) {
+                            io.github.thwisse.kentinsesi.data.model.PostStatus.NEW -> "Yeni"
+                            io.github.thwisse.kentinsesi.data.model.PostStatus.IN_PROGRESS -> "İşlemde"
+                            io.github.thwisse.kentinsesi.data.model.PostStatus.RESOLVED -> "Çözüldü"
+                            else -> "Güncellendi"
+                        }
+                        Toast.makeText(requireContext(), "Durum güncellendi: $statusText", Toast.LENGTH_SHORT).show()
+                        setupViews(post)
                     }
                 }
                 is Resource.Error -> Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
