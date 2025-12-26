@@ -42,6 +42,9 @@
         <action
             android:id="@+id/action_nav_profile_to_postDetailFragment"
             app:destination="@id/postDetailFragment" />
+        <action
+            android:id="@+id/action_nav_profile_to_adminPanelFragment"
+            app:destination="@id/adminPanelFragment" />
     </fragment>
     <fragment
         android:id="@+id/createPostFragment"
@@ -72,4 +75,9 @@
         android:name="io.github.thwisse.kentinsesi.ui.map.LocationPickerFragment"
         android:label="fragment_location_picker"
         tools:layout="@layout/fragment_location_picker" />
+    <fragment
+        android:id="@+id/adminPanelFragment"
+        android:name="io.github.thwisse.kentinsesi.ui.admin.AdminPanelFragment"
+        android:label="Admin Paneli"
+        tools:layout="@layout/fragment_admin_panel" />
 </navigation>

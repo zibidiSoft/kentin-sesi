@@ -82,4 +82,38 @@ class UserRepositoryImpl @Inject constructor(
             Resource.Error(e.message ?: "Kullanıcı rolü alınamadı.")
         }
     }
+    
+    // 5. Tüm kullanıcıları getir (Admin paneli için)
+    override suspend fun getAllUsers(): Resource<List<User>> {
+        return try {
+            // fullName boş olabilir, bu yüzden sıralama yapmadan çekiyoruz
+            // Sonra Kotlin'de sıralayacağız
+            val snapshot = firestore.collection(Constants.COLLECTION_USERS)
+                .get()
+                .await()
+            
+            val users = snapshot.documents.mapNotNull { doc ->
+                val user = doc.toObject(User::class.java)
+                user?.copy(uid = doc.id) // UID'yi document ID'den al
+            }.sortedBy { it.fullName.ifEmpty { it.email } } // fullName yoksa email'e göre sırala
+            
+            Resource.Success(users)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Kullanıcılar alınamadı.")
+        }
+    }
+    
+    // 6. Kullanıcı rolünü güncelle (Admin paneli için)
+    override suspend fun updateUserRole(uid: String, newRole: String): Resource<Unit> {
+        return try {
+            firestore.collection(Constants.COLLECTION_USERS)
+                .document(uid)
+                .update("role", newRole)
+                .await()
+            
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Rol güncellenemedi.")
+        }
+    }
 }

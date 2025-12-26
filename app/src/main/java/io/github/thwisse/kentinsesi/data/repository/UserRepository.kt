@@ -14,4 +14,10 @@ interface UserRepository {
     
     // Kullanıcının rolünü kontrol et
     suspend fun getUserRole(uid: String): Resource<String>
+    
+    // Admin paneli için: Tüm kullanıcıları getir
+    suspend fun getAllUsers(): Resource<List<User>>
+    
+    // Admin paneli için: Kullanıcı rolünü güncelle
+    suspend fun updateUserRole(uid: String, newRole: String): Resource<Unit>
 }

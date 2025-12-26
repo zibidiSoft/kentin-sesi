@@ -40,6 +40,22 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             startActivity(intent)
             requireActivity().finish()
         }
+
+        // Admin Paneli Butonu (sadece admin kullanıcılar görebilir)
+        viewModel.userProfile.observe(viewLifecycleOwner) { resource ->
+            if (resource is Resource.Success) {
+                val user = resource.data
+                binding.btnAdminPanel.visibility = if (user?.isAdmin == true) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+            }
+        }
+
+        binding.btnAdminPanel.setOnClickListener {
+            findNavController().navigate(R.id.action_nav_profile_to_adminPanelFragment)
+        }
     }
 
     private fun setupUserInfo() {
