@@ -28,6 +28,12 @@
         <action
             android:id="@+id/action_nav_map_to_postDetailFragment"
             app:destination="@id/postDetailFragment" />
+        <action
+            android:id="@+id/action_nav_map_to_createPostFragment"
+            app:destination="@id/createPostFragment" />
+        <action
+            android:id="@+id/action_nav_map_to_filterBottomSheetFragment"
+            app:destination="@id/filterBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/nav_notifications"

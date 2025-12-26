@@ -12,10 +12,11 @@ constraintlayout = "2.2.1"
 navigation = "2.7.7"
 googleGmsPlugin = "4.4.2"
 firebaseBom = "33.1.2"
-hilt = "2.51.1"
+hilt = "2.57.2"
 kotlinKapt = "2.1.20"
 playServicesLocation = "21.0.1"
 coil = "2.6.0"
+lifecycleCommonJvm = "2.10.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,6 +38,7 @@ hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", v
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage-ktx" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+androidx-lifecycle-common-jvm = { group = "androidx.lifecycle", name = "lifecycle-common-jvm", version.ref = "lifecycleCommonJvm" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
