@@ -49,13 +49,13 @@ service cloud.firestore {
                        isOwner(request.resource.data.authorId);
       
       // Güncelleme: 
-      // - Post sahibi kendi postunu güncelleyebilir (sadece title, description, category)
+      // - Post sahibi kendi postunu güncelleyebilir (title, description, category, status)
       // - Yetkili kullanıcılar status'u güncelleyebilir
       allow update: if isAuthenticated() && (
-        // Post sahibi sadece belirli alanları güncelleyebilir
+        // Post sahibi belirli alanları güncelleyebilir (status dahil - kendi postunu çözüldü olarak işaretleyebilir)
         (isOwner(resource.data.authorId) && 
-         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description', 'category', 'imageUrl'])) ||
-        // Yetkili kullanıcılar status'u güncelleyebilir
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description', 'category', 'imageUrl', 'status'])) ||
+        // Yetkili kullanıcılar sadece status'u güncelleyebilir
         (isOfficial() && 
          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']))
       );

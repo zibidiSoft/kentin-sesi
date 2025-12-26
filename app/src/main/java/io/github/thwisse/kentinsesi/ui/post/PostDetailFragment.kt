@@ -33,36 +33,93 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
 
     private var postLocation: LatLng? = null
     private var currentPostId: String? = null
+    private var currentPost: Post? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentPostDetailBinding.bind(view)
 
-        val post = arguments?.getParcelable<Post>("post")
-
-        if (post != null) {
-            currentPostId = post.id
-            // ViewModel'e post bilgisini set et (yetkili kontrolü için gerekli)
-            viewModel.setPost(post)
-            
-            setupViews(post)
-            setupMap(post)
-            setupComments()
-            setupOfficialActions() // Yetkili butonlarını ayarla
-
-            // Yorumları Çek
-            viewModel.getComments(post.id)
-
-            // Menü kurulumu - Post sahibi için
-            if (viewModel.currentUserId == post.authorId) {
-                setupOwnerMenu()
+        // State restore stratejisi:
+        // 1. ViewModel'den dene (eğer ViewModel hala varsa - process death olmadıysa)
+        // 2. Arguments'tan postId al ve çek (ilk yükleme)
+        // 3. savedInstanceState'tan post ID al ve tekrar çek (process death durumunda)
+        val viewModelPost = viewModel.currentPost.value
+        val argumentPostId = arguments?.getString("postId")
+        val savedPostId = savedInstanceState?.getString("saved_post_id")
+        
+        val postIdToLoad = viewModelPost?.id ?: argumentPostId ?: savedPostId
+        
+        when {
+            // En iyi durum: ViewModel'de post var (process death olmadı)
+            viewModelPost != null -> {
+                loadPost(viewModelPost)
+            }
+            // İkinci ve üçüncü durum: Post ID var, tekrar çekmemiz gerekiyor
+            postIdToLoad != null -> {
+                currentPostId = postIdToLoad
+                // Post'u yükle
+                viewModel.loadPostById(postIdToLoad)
+                // ViewModel'den post'u observe et
+                observePostFromViewModel()
+            }
+            else -> {
+                // Hiçbir şey yok, geri git
+                findNavController().navigateUp()
             }
         }
 
-        // --- DEĞİŞİKLİK: binding.toolbar kodları SİLİNDİ ---
-        // Geri butonu artık MainActivity'deki setSupportActionBar sayesinde otomatik çalışacak.
-
         observeOwnerActions()
+    }
+    
+    /**
+     * Post'u yükle ve UI'ı kur
+     */
+    private fun loadPost(post: Post) {
+        currentPost = post
+        currentPostId = post.id
+        
+        // ViewModel'e post bilgisini set et
+        viewModel.setPost(post)
+        
+        setupViews(post)
+        setupMap(post)
+        setupComments()
+        setupOfficialActions()
+        
+        // Menü kurulumu
+        setupOwnerMenu()
+
+        // Yorumları Çek (sadece ilk yüklemede)
+        viewModel.getComments(post.id)
+    }
+    
+    /**
+     * ViewModel'den post'u observe et (process death sonrası restore için)
+     */
+    private fun observePostFromViewModel() {
+        viewModel.currentPost.observe(viewLifecycleOwner) { post ->
+            post?.let {
+                if (currentPost == null) {
+                    // İlk kez yükleniyor - Post restore edildi
+                    loadPost(it)
+                    // Yorumları da yükle
+                    viewModel.getComments(it.id)
+                } else {
+                    // Post zaten yüklü, sadece güncelle (status değişikliği gibi)
+                    currentPost = it
+                    setupViews(it)
+                }
+            }
+        }
+    }
+    
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        // Post'u direkt kaydetme (GeoPoint Parcelable değil, crash veriyor)
+        // Sadece post ID'sini kaydet, restore ederken tekrar çekeceğiz
+        currentPostId?.let {
+            outState.putString("saved_post_id", it)
+        }
     }
 
     private fun setupOwnerMenu() {
@@ -71,14 +128,18 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
             override fun onCreateMenu(menu: android.view.Menu, menuInflater: android.view.MenuInflater) {
                 menuInflater.inflate(io.github.thwisse.kentinsesi.R.menu.menu_post_detail, menu)
                 
-                // Yetkili kontrolü - Sadece yetkili kullanıcılar durum güncelleyebilir
-                viewModel.canUpdateStatus.observe(viewLifecycleOwner) { canUpdate ->
-                    menu.findItem(io.github.thwisse.kentinsesi.R.id.action_resolve)?.isVisible = canUpdate
-                }
+                // Başlangıçta menü öğelerini gizle, LiveData güncellendiğinde göster
+                menu.findItem(io.github.thwisse.kentinsesi.R.id.action_resolve)?.isVisible = false
+                menu.findItem(io.github.thwisse.kentinsesi.R.id.action_delete)?.isVisible = false
                 
                 // Silme kontrolü - Post sahibi veya admin silebilir
                 viewModel.canDeletePost.observe(viewLifecycleOwner) { canDelete ->
                     menu.findItem(io.github.thwisse.kentinsesi.R.id.action_delete)?.isVisible = canDelete
+                }
+                
+                // Çözüldü olarak işaretle - Yetkili kullanıcılar veya post sahibi yapabilir
+                viewModel.canUpdateStatus.observe(viewLifecycleOwner) { canUpdate ->
+                    menu.findItem(io.github.thwisse.kentinsesi.R.id.action_resolve)?.isVisible = canUpdate
                 }
             }
 

@@ -59,8 +59,8 @@
         tools:layout="@layout/fragment_post_detail">
 
         <argument
-            android:name="post"
-            app:argType="io.github.thwisse.kentinsesi.data.model.Post" />
+            android:name="postId"
+            app:argType="string" />
     </fragment>
     <dialog
         android:id="@+id/filterBottomSheetFragment"

@@ -51,12 +51,14 @@ class PostRepositoryImpl @Inject constructor(
                 location = GeoPoint(latitude, longitude),
                 district = district,
                 // Enum kullanarak tip güvenli hale getirdik
-                status = PostStatus.NEW.value, // "new" yerine PostStatus.NEW.value
-                upvoteCount = 0
+                status = PostStatus.NEW.value,
+                // Post oluşturulduğunda yazarın kendi oyu otomatik +1 olarak ekleniyor
+                upvoteCount = 1,
+                upvotedBy = listOf(currentUser.uid) // Yazarın kendisi otomatik upvote ediyor
             )
 
             // Constants kullanarak collection adını merkezileştirdik
-            firestore.collection(Constants.COLLECTION_POSTS).add(newPost).await()
+            val docRef = firestore.collection(Constants.COLLECTION_POSTS).add(newPost).await()
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Hata")
@@ -205,6 +207,28 @@ class PostRepositoryImpl @Inject constructor(
             Resource.Success(postList)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Veriler alınamadı.")
+        }
+    }
+    
+    override suspend fun getPostById(postId: String): Resource<Post> {
+        return try {
+            val document = firestore.collection(Constants.COLLECTION_POSTS)
+                .document(postId)
+                .get()
+                .await()
+            
+            if (document.exists()) {
+                val post = document.toObject(Post::class.java)
+                if (post != null) {
+                    Resource.Success(post.copy(id = document.id))
+                } else {
+                    Resource.Error("Post verisi okunamadı.")
+                }
+            } else {
+                Resource.Error("Post bulunamadı.")
+            }
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Post alınamadı.")
         }
     }
 }

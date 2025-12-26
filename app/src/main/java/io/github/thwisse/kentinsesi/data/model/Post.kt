@@ -4,17 +4,16 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ServerTimestamp
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.RawValue
 
 /**
  * Post modeli - Vatandaşların oluşturduğu bildirimleri temsil eder
  * 
- * ÖNEMLİ: Firestore string olarak sakladığı için status'u String olarak tutuyoruz,
- * ama enum'a çevirmek için helper fonksiyonlar ekledik (aşağıda)
+ * ÖNEMLİ: 
+ * - Firestore string olarak sakladığı için status'u String olarak tutuyoruz
+ * - GeoPoint Parcelable olmadığı için Post'u Parcelable yapmıyoruz
+ * - Navigation'da postId kullanılıyor, Post direkt gönderilmiyor
  */
-@Parcelize
 data class Post(
     val id: String = "", // Firestore Document ID'si
     @DocumentId
@@ -36,7 +35,7 @@ data class Post(
     val status: String = PostStatus.NEW.value, // Varsayılan: "new"
     val upvoteCount: Long = 0,
     val upvotedBy: List<String> = emptyList(),
-) : Parcelable {
+) {
     
     /**
      * Status'u enum olarak döndürür - Kod içinde kullanım için

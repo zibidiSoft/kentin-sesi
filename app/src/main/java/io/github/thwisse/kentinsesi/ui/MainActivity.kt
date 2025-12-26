@@ -58,6 +58,20 @@ class MainActivity : AppCompatActivity() {
 
         // --- ALT MENÜ KURULUMU ---
         binding.bottomNavView.setupWithNavController(navController)
+        
+        // Bottom Navigation View'ı belirli ekranlarda gizle
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            // PostDetail ve CreatePost ekranlarında bottom nav'i gizle
+            val hideBottomNav = destination.id == R.id.postDetailFragment || 
+                               destination.id == R.id.createPostFragment ||
+                               destination.id == R.id.locationPickerFragment
+            
+            binding.bottomNavView.visibility = if (hideBottomNav) {
+                android.view.View.GONE
+            } else {
+                android.view.View.VISIBLE
+            }
+        }
     }
 
     // Geri butonuna (Toolbar üzerindeki ok) basıldığında çalışması için gerekli

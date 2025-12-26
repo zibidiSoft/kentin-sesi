@@ -35,4 +35,7 @@ interface PostRepository {
     suspend fun deletePost(postId: String): Resource<Unit>
 
     suspend fun getUserPosts(userId: String): Resource<List<io.github.thwisse.kentinsesi.data.model.Post>>
+    
+    // Post ID'ye göre tek bir post getir (State restore için)
+    suspend fun getPostById(postId: String): Resource<io.github.thwisse.kentinsesi.data.model.Post>
 }

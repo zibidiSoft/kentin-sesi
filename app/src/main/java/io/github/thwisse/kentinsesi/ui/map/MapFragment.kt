@@ -98,14 +98,11 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback, GoogleM
     override fun onInfoWindowClick(marker: Marker) {
         val post = markerPostMap[marker]
         if (post != null) {
-            // Detay sayfasına git
-            val bundle = Bundle().apply { putParcelable("post", post) }
-            // ÖNEMLİ: Nav Graph'ta Map -> Detail okunu (action) oluşturmalıyız.
-            // ID'sini kontrol et: action_nav_map_to_postDetailFragment
+            // Detay sayfasına git (sadece post ID gönder)
+            val bundle = Bundle().apply { putString("postId", post.id) }
             try {
                 findNavController().navigate(R.id.action_nav_map_to_postDetailFragment, bundle)
             } catch (e: Exception) {
-                // Eğer action yoksa loga yaz veya toast göster
                 Toast.makeText(requireContext(), "Navigasyon hatası", Toast.LENGTH_SHORT).show()
             }
         }

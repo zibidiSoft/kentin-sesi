@@ -44,10 +44,16 @@ class PostDetailViewModel @Inject constructor(
     val currentUser: LiveData<io.github.thwisse.kentinsesi.data.model.User?> = _currentUser
     
     // Yetki kontrolleri için LiveData'lar - MediatorLiveData kullanarak
+    // Post sahibi veya yetkili kullanıcılar durum güncelleyebilir
     val canUpdateStatus: LiveData<Boolean> = MediatorLiveData<Boolean>().apply {
-        addSource(_currentUser) { user ->
-            value = AuthorizationUtils.canUpdatePostStatus(user)
+        fun update() {
+            val user = _currentUser.value
+            val post = _currentPost.value
+            val isOwner = post?.authorId == currentUserId
+            value = AuthorizationUtils.canUpdatePostStatus(user) || isOwner
         }
+        addSource(_currentUser) { update() }
+        addSource(_currentPost) { update() }
     }
     
     val canDeletePost: LiveData<Boolean> = MediatorLiveData<Boolean>().apply {
@@ -91,6 +97,34 @@ class PostDetailViewModel @Inject constructor(
         // Kullanıcı bilgisini coroutine içinde yükle
         viewModelScope.launch {
             loadCurrentUser()
+        }
+    }
+    
+    /**
+     * Post ID'ye göre post bilgisini yükle (State restore için)
+     */
+    fun loadPostById(postId: String) {
+        viewModelScope.launch {
+            _currentPost.value?.let { 
+                // Zaten yüklüyse tekrar yükleme
+                if (it.id == postId) return@launch
+            }
+            
+            val result = postRepository.getPostById(postId)
+            when (result) {
+                is Resource.Success -> {
+                    result.data?.let { post ->
+                        _currentPost.value = post
+                        loadCurrentUser()
+                    }
+                }
+                is Resource.Error -> {
+                    // Hata durumunda bir şey yapma, Fragment handle edecek
+                }
+                is Resource.Loading -> {
+                    // Loading durumu
+                }
+            }
         }
     }
 
@@ -139,17 +173,21 @@ class PostDetailViewModel @Inject constructor(
     }
     
     /**
-     * Post durumunu güncelle - Sadece yetkili kullanıcılar için
+     * Post durumunu güncelle - Yetkili kullanıcılar veya post sahibi yapabilir
      * @param postId Güncellenecek post'un ID'si
      * @param status Yeni durum
      */
     fun updatePostStatus(postId: String, status: PostStatus) {
         viewModelScope.launch {
             val user = _currentUser.value
+            val post = _currentPost.value
             
-            // Yetki kontrolü
-            if (!AuthorizationUtils.canUpdatePostStatus(user)) {
-                _updateStatusState.value = Resource.Error("Post durumunu güncellemek için yetkili olmanız gerekiyor.")
+            // Yetki kontrolü: Yetkili kullanıcılar veya post sahibi güncelleyebilir
+            val isOwner = post?.authorId == currentUserId
+            val canUpdate = AuthorizationUtils.canUpdatePostStatus(user) || isOwner
+            
+            if (!canUpdate) {
+                _updateStatusState.value = Resource.Error("Post durumunu güncellemek için yetkiniz yok.")
                 return@launch
             }
             
@@ -159,8 +197,8 @@ class PostDetailViewModel @Inject constructor(
             
             // Başarılıysa post bilgisini güncelle
             if (result is Resource.Success) {
-                _currentPost.value?.let { post ->
-                    _currentPost.value = post.copy(status = status.value)
+                _currentPost.value?.let { currentPost ->
+                    _currentPost.value = currentPost.copy(status = status.value)
                 }
             }
         }

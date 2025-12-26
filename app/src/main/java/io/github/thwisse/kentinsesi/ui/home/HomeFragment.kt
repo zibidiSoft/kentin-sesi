@@ -110,9 +110,9 @@ class HomeFragment : Fragment() {
                 viewModel.toggleUpvote(clickedPost)
             },
             onItemClick = { clickedPost ->
-                // Karta tıklandı -> Detay sayfasına git ve veriyi taşı
+                // Karta tıklandı -> Detay sayfasına git (sadece post ID gönder)
                 val bundle = android.os.Bundle().apply {
-                    putParcelable("post", clickedPost)
+                    putString("postId", clickedPost.id)
                 }
                 findNavController().navigate(R.id.action_homeFragment_to_postDetailFragment, bundle)
             }

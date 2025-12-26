@@ -16,7 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val postRepository: PostRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val userRepository: io.github.thwisse.kentinsesi.data.repository.UserRepository
 ) : ViewModel() {
 
     private val _userPosts = MutableLiveData<Resource<List<Post>>>()
@@ -29,11 +30,29 @@ class ProfileViewModel @Inject constructor(
     private val _resolvedPostsCount = MutableLiveData<Int>()
     val resolvedPostsCount: LiveData<Int> = _resolvedPostsCount
 
-    // Kullanıcı bilgisi
+    // Kullanıcı bilgisi - Firebase User
     val currentUser = authRepository.currentUser
+    
+    // Kullanıcı profil bilgisi - User model (fullName, city, district için)
+    private val _userProfile = MutableLiveData<Resource<io.github.thwisse.kentinsesi.data.model.User>>()
+    val userProfile: LiveData<Resource<io.github.thwisse.kentinsesi.data.model.User>> = _userProfile
 
     init {
+        loadUserProfile()
         loadUserPosts()
+    }
+    
+    /**
+     * Kullanıcı profil bilgisini yükle (fullName, city, district için)
+     */
+    fun loadUserProfile() {
+        val userId = currentUser?.uid ?: return
+        
+        viewModelScope.launch {
+            _userProfile.value = Resource.Loading()
+            val result = userRepository.getUser(userId)
+            _userProfile.value = result
+        }
     }
 
     fun loadUserPosts() {
@@ -53,6 +72,14 @@ class ProfileViewModel @Inject constructor(
 
             _userPosts.value = result
         }
+    }
+    
+    /**
+     * Pull-to-refresh için: Hem profil hem postları yenile
+     */
+    fun refreshAll() {
+        loadUserProfile()
+        loadUserPosts()
     }
 
     fun signOut() {

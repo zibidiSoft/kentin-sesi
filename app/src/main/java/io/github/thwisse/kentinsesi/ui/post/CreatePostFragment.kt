@@ -44,6 +44,31 @@ class CreatePostFragment : Fragment(R.layout.fragment_create_post) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentCreatePostBinding.bind(view)
 
+        // State restore
+        savedInstanceState?.let { savedState ->
+            savedState.getParcelable<Uri>("saved_image_uri")?.let {
+                selectedImageUri = it
+            }
+            savedState.getDouble("saved_latitude", Double.NaN).takeIf { !it.isNaN() }?.let {
+                currentLatitude = it
+            }
+            savedState.getDouble("saved_longitude", Double.NaN).takeIf { !it.isNaN() }?.let {
+                currentLongitude = it
+            }
+            savedState.getString("saved_title")?.let {
+                binding.etTitle.setText(it)
+            }
+            savedState.getString("saved_description")?.let {
+                binding.etDescription.setText(it)
+            }
+            savedState.getString("saved_category")?.let {
+                binding.actvCategory.setText(it)
+            }
+            savedState.getString("saved_district")?.let {
+                binding.actvDistrict.setText(it)
+            }
+        }
+
         setupDistrictSpinner()
         setupCategorySpinner()
 
@@ -56,15 +81,43 @@ class CreatePostFragment : Fragment(R.layout.fragment_create_post) {
         // 3. ViewModel'i dinle
         observeViewModel()
 
-        // NOT: Artık getCurrentLocation() çağırmıyoruz!
-
-        // --- EKLENECEK KISIM (STATE RESTORATION) ---
-        // Eğer daha önce resim seçildiyse, ekran geri geldiğinde tekrar yükle
-        if (selectedImageUri != null) {
-            binding.ivPostImage.setImageURI(selectedImageUri)
+        // State restore: Eğer daha önce resim seçildiyse, ekran geri geldiğinde tekrar yükle
+        selectedImageUri?.let {
+            binding.ivPostImage.setImageURI(it)
             binding.ivPostImage.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
         }
-        // --------------------------------------------
+        
+        // State restore: Konum bilgisi varsa göster
+        if (currentLatitude != null && currentLongitude != null) {
+            binding.tvLocationInfo.text = "Konum Seçildi: ${String.format("%.4f", currentLatitude)}, ${String.format("%.4f", currentLongitude)}"
+            binding.tvLocationInfo.setTextColor(resources.getColor(android.R.color.holo_green_dark, null))
+        }
+    }
+    
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        // Form verilerini kaydet
+        selectedImageUri?.let {
+            outState.putParcelable("saved_image_uri", it)
+        }
+        currentLatitude?.let {
+            outState.putDouble("saved_latitude", it)
+        }
+        currentLongitude?.let {
+            outState.putDouble("saved_longitude", it)
+        }
+        binding.etTitle.text.toString().takeIf { it.isNotEmpty() }?.let {
+            outState.putString("saved_title", it)
+        }
+        binding.etDescription.text.toString().takeIf { it.isNotEmpty() }?.let {
+            outState.putString("saved_description", it)
+        }
+        binding.actvCategory.text.toString().takeIf { it.isNotEmpty() }?.let {
+            outState.putString("saved_category", it)
+        }
+        binding.actvDistrict.text.toString().takeIf { it.isNotEmpty() }?.let {
+            outState.putString("saved_district", it)
+        }
     }
 
     private fun setupLocationResultListener() {
