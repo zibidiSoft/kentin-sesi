@@ -472,4 +472,42 @@ Proje **sağlam bir temel** üzerine kurulmuş. Mimari doğru, kod organizasyonu
 
 *Rapor Tarihi: 2025*  
 *Hazırlayan: AI Code Assistant*
+ 
+ 
+ 
+ 
 
+---
+
+## 🧩 Ek Notlar (Cascade Analizi) — Sonradan Ele Alınacaklar
+
+**Tarih:** 2025-12-26  
+**Not:** Aşağıdaki maddeler “şu an değil, sonra” ele alınmak üzere eklenmiştir.
+
+### 1) Post ID alanı tutarsızlığı (id vs postId) — Yüksek risk
+- **Gözlem:** `Post` modelinde hem `id` hem `@DocumentId postId` var. Navigation ve repo çağrıları bazı yerlerde `id`, bazı yerlerde `postId` kullanıyor.
+- **Risk:** Detaya geçiş / upvote / state-restore gibi yerlerde yanlış/boş ID ile işlem yapılması.
+- **Öneri:** Tek bir “kanonik post id” yaklaşımı belirlenip tüm kod tabanında standardize edilmeli.
+
+### 2) Kategori / ilçe değerlerinin standardı (UI label vs canonical code)
+- **Gözlem:** UI tarafında Türkçe kategori/ilçe listeleri hardcoded. `Constants` tarafında ise kategori için farklı “code” değerleri var.
+- **Risk:** Filtreleme / istatistik / çoklu dil / analitik gibi alanlarda veri tutarsızlığı.
+- **Öneri:** Firestore’da saklanan değer formatı netleştirilmeli (label mı code mu), tek format kullanılmalı.
+
+### 3) Yetkilendirme akışı (citizen/official/admin) ve sunucu tarafı
+- **Gözlem:** UI/ViewModel tarafında `AuthorizationUtils` ile menü/aksiyon kısıtları var; fakat asıl kritik olan Firestore Security Rules tarafında aynı mantığın garanti edilmesi.
+- **Risk:** Sadece UI kontrolü ile yetkisiz işlemler teorik olarak mümkün olabilir.
+- **Öneri:** Yetki modeli ve rules tarafı birlikte gözden geçirilmeli.
+
+### 4) CreatePost -> district seçimi validasyonu
+- **Gözlem:** `CreatePostFragment` içinde `district` boş geçebiliyor gibi (kategori zorunlu kontrol edilmiş; ilçe için aynı net kontrol görünmüyor).
+- **Öneri:** Post oluşturma formunda ilçe zorunluluğu netleştirilmeli (ürün kararına göre).
+
+### 5) Harita/Detay ekranlarında postId aktarımı
+- **Gözlem:** `MapFragment` ve `HomeFragment` detaya giderken `post.id` gönderiyor.
+- **Risk:** Post listesi Firestore’dan `@DocumentId` ile dolduruluyorsa `id` boş kalabilir.
+- **Öneri:** Detaya giderken “kanonik post id” gönderilmeli.
+
+---
+
+*Ek Notlar Hazırlayan: Cascade*
