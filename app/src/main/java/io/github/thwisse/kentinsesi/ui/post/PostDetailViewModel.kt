@@ -166,13 +166,6 @@ class PostDetailViewModel @Inject constructor(
     }
 
     /**
-     * Post'u "Çözüldü" olarak işaretle - Sadece yetkili kullanıcılar
-     */
-    fun markAsResolved(postId: String) {
-        updatePostStatus(postId, PostStatus.RESOLVED)
-    }
-    
-    /**
      * Post durumunu güncelle - Yetkili kullanıcılar veya post sahibi yapabilir
      * @param postId Güncellenecek post'un ID'si
      * @param status Yeni durum

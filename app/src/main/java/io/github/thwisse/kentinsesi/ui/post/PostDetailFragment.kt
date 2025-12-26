@@ -129,7 +129,7 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
                 menuInflater.inflate(io.github.thwisse.kentinsesi.R.menu.menu_post_detail, menu)
                 
                 // Başlangıçta menü öğelerini gizle, LiveData güncellendiğinde göster
-                menu.findItem(io.github.thwisse.kentinsesi.R.id.action_resolve)?.isVisible = false
+                menu.findItem(io.github.thwisse.kentinsesi.R.id.action_update_status)?.isVisible = false
                 menu.findItem(io.github.thwisse.kentinsesi.R.id.action_delete)?.isVisible = false
                 
                 // Silme kontrolü - Post sahibi veya admin silebilir
@@ -137,16 +137,16 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
                     menu.findItem(io.github.thwisse.kentinsesi.R.id.action_delete)?.isVisible = canDelete
                 }
                 
-                // Çözüldü olarak işaretle - Yetkili kullanıcılar veya post sahibi yapabilir
+                // Durumu güncelle - Yetkili kullanıcılar veya post sahibi yapabilir
                 viewModel.canUpdateStatus.observe(viewLifecycleOwner) { canUpdate ->
-                    menu.findItem(io.github.thwisse.kentinsesi.R.id.action_resolve)?.isVisible = canUpdate
+                    menu.findItem(io.github.thwisse.kentinsesi.R.id.action_update_status)?.isVisible = canUpdate
                 }
             }
 
             override fun onMenuItemSelected(menuItem: android.view.MenuItem): Boolean {
                 return when (menuItem.itemId) {
-                    io.github.thwisse.kentinsesi.R.id.action_resolve -> {
-                        currentPostId?.let { viewModel.markAsResolved(it) }
+                    io.github.thwisse.kentinsesi.R.id.action_update_status -> {
+                        showUpdateStatusDialog()
                         true
                     }
                     io.github.thwisse.kentinsesi.R.id.action_delete -> {
@@ -157,6 +157,61 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
                 }
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+    
+    /**
+     * Post durumunu güncellemek için dialog göster
+     */
+    private fun showUpdateStatusDialog() {
+        val dialogView = layoutInflater.inflate(io.github.thwisse.kentinsesi.R.layout.dialog_update_post_status, null)
+        val dialog = android.app.AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+        
+        val rgStatus = dialogView.findViewById<android.widget.RadioGroup>(io.github.thwisse.kentinsesi.R.id.rgStatus)
+        val btnCancel = dialogView.findViewById<android.widget.Button>(io.github.thwisse.kentinsesi.R.id.btnCancel)
+        val btnUpdate = dialogView.findViewById<android.widget.Button>(io.github.thwisse.kentinsesi.R.id.btnUpdate)
+        
+        // Mevcut durumu seçili yap
+        val currentPost = currentPost ?: viewModel.currentPost.value
+        currentPost?.let { post ->
+            when (post.statusEnum) {
+                io.github.thwisse.kentinsesi.data.model.PostStatus.NEW -> {
+                    rgStatus.check(io.github.thwisse.kentinsesi.R.id.rbNew)
+                }
+                io.github.thwisse.kentinsesi.data.model.PostStatus.IN_PROGRESS -> {
+                    rgStatus.check(io.github.thwisse.kentinsesi.R.id.rbInProgress)
+                }
+                io.github.thwisse.kentinsesi.data.model.PostStatus.RESOLVED -> {
+                    rgStatus.check(io.github.thwisse.kentinsesi.R.id.rbResolved)
+                }
+                else -> {
+                    rgStatus.check(io.github.thwisse.kentinsesi.R.id.rbNew)
+                }
+            }
+        }
+        
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        btnUpdate.setOnClickListener {
+            val selectedStatus = when (rgStatus.checkedRadioButtonId) {
+                io.github.thwisse.kentinsesi.R.id.rbNew -> io.github.thwisse.kentinsesi.data.model.PostStatus.NEW
+                io.github.thwisse.kentinsesi.R.id.rbInProgress -> io.github.thwisse.kentinsesi.data.model.PostStatus.IN_PROGRESS
+                io.github.thwisse.kentinsesi.R.id.rbResolved -> io.github.thwisse.kentinsesi.data.model.PostStatus.RESOLVED
+                else -> null
+            }
+            
+            selectedStatus?.let { status ->
+                currentPostId?.let { postId ->
+                    viewModel.updatePostStatus(postId, status)
+                    dialog.dismiss()
+                }
+            }
+        }
+        
+        dialog.show()
     }
 
     private fun observeOwnerActions() {
@@ -174,7 +229,18 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
         viewModel.updateStatusState.observe(viewLifecycleOwner) { resource ->
             when(resource) {
                 is Resource.Success -> {
-                    Toast.makeText(requireContext(), "Durum güncellendi: Çözüldü!", Toast.LENGTH_SHORT).show()
+                    val updatedPost = viewModel.currentPost.value
+                    val statusText = when (updatedPost?.statusEnum) {
+                        io.github.thwisse.kentinsesi.data.model.PostStatus.NEW -> "Yeni"
+                        io.github.thwisse.kentinsesi.data.model.PostStatus.IN_PROGRESS -> "İşlemde"
+                        io.github.thwisse.kentinsesi.data.model.PostStatus.RESOLVED -> "Çözüldü"
+                        else -> "Güncellendi"
+                    }
+                    Toast.makeText(requireContext(), "Durum güncellendi: $statusText", Toast.LENGTH_SHORT).show()
+                    // Post bilgisini güncelle - ViewModel'den gelen güncel post'u kullan
+                    updatedPost?.let { 
+                        setupViews(it)
+                    }
                 }
                 is Resource.Error -> Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
                 is Resource.Loading -> { }
