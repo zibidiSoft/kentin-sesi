@@ -17,9 +17,9 @@ interface PostRepository {
 
     // YENİ EKLENEN: Tüm postları getir
     suspend fun getPosts(
-        district: String? = null,
-        category: String? = null,
-        status: String? = null
+        districts: List<String>? = null,
+        categories: List<String>? = null,
+        statuses: List<String>? = null
     ): Resource<List<io.github.thwisse.kentinsesi.data.model.Post>>
 
     // Post ID ve Kullanıcı ID alır

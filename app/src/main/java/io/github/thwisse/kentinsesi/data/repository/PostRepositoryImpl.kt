@@ -91,31 +91,125 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getPosts(
-        district: String?,
-        category: String?,
-        status: String?
+        districts: List<String>?,
+        categories: List<String>?,
+        statuses: List<String>?
     ): Resource<List<Post>> {
         return try {
+            val hasDistrictFilter = !districts.isNullOrEmpty()
+            val hasCategoryFilter = !categories.isNullOrEmpty()
+            val hasStatusFilter = !statuses.isNullOrEmpty()
+
+            // Hiç filtre yoksa tüm postları çek
+            if (!hasDistrictFilter && !hasCategoryFilter && !hasStatusFilter) {
+                val snapshot = firestore.collection(Constants.COLLECTION_POSTS)
+                    .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                    .get()
+                    .await()
+                
+                val postList = snapshot.documents.map { doc ->
+                    val post = doc.toObject(Post::class.java)!!
+                    post.copy(id = doc.id)
+                }
+                return Resource.Success(postList)
+            }
+
+            // Firestore'da whereIn kullanarak çoklu filtreleme yapıyoruz
+            // Ancak Firestore'da aynı anda sadece bir whereIn kullanılabilir
+            // Bu yüzden en kısıtlayıcı filtreyi Firestore'da uygulayıp, diğerlerini client-side'da filtreleyeceğiz
+            
             var query = firestore.collection(Constants.COLLECTION_POSTS) as com.google.firebase.firestore.Query
+            var postList: List<Post>
 
-            if (!district.isNullOrEmpty()) {
-                query = query.whereEqualTo("district", district)
+            // En kısıtlayıcı filtreyi seç (en az sonuç döndüren)
+            when {
+                // Sadece bir filtre varsa Firestore'da filtrele
+                hasDistrictFilter && !hasCategoryFilter && !hasStatusFilter -> {
+                    if (districts!!.size == 1) {
+                        query = query.whereEqualTo("district", districts[0])
+                    } else {
+                        // whereIn maksimum 10 item alabilir, daha fazlası için client-side filtreleme
+                        if (districts.size <= 10) {
+                            query = query.whereIn("district", districts)
+                        }
+                    }
+                    query = query.orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                    val snapshot = query.get().await()
+                    postList = snapshot.documents.map { doc ->
+                        val post = doc.toObject(Post::class.java)!!
+                        post.copy(id = doc.id)
+                    }
+                    // whereIn 10'dan fazla item için kullanılamaz, client-side filtrele
+                    if (districts.size > 10) {
+                        postList = postList.filter { districts.contains(it.district) }
+                    }
+                }
+                !hasDistrictFilter && hasCategoryFilter && !hasStatusFilter -> {
+                    if (categories!!.size == 1) {
+                        query = query.whereEqualTo("category", categories[0])
+                    } else {
+                        if (categories.size <= 10) {
+                            query = query.whereIn("category", categories)
+                        }
+                    }
+                    query = query.orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                    val snapshot = query.get().await()
+                    postList = snapshot.documents.map { doc ->
+                        val post = doc.toObject(Post::class.java)!!
+                        post.copy(id = doc.id)
+                    }
+                    if (categories.size > 10) {
+                        postList = postList.filter { categories.contains(it.category) }
+                    }
+                }
+                !hasDistrictFilter && !hasCategoryFilter && hasStatusFilter -> {
+                    if (statuses!!.size == 1) {
+                        query = query.whereEqualTo("status", statuses[0])
+                    } else {
+                        if (statuses.size <= 10) {
+                            query = query.whereIn("status", statuses)
+                        }
+                    }
+                    query = query.orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                    val snapshot = query.get().await()
+                    postList = snapshot.documents.map { doc ->
+                        val post = doc.toObject(Post::class.java)!!
+                        post.copy(id = doc.id)
+                    }
+                    if (statuses.size > 10) {
+                        postList = postList.filter { statuses.contains(it.status) }
+                    }
+                }
+                // Birden fazla filtre varsa - tümünü çek, client-side'da filtrele
+                else -> {
+                    val snapshot = firestore.collection(Constants.COLLECTION_POSTS)
+                        .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                        .get()
+                        .await()
+                    postList = snapshot.documents.map { doc ->
+                        val post = doc.toObject(Post::class.java)!!
+                        post.copy(id = doc.id)
+                    }
+                }
             }
 
-            if (!category.isNullOrEmpty()) {
-                query = query.whereEqualTo("category", category)
+            // Client-side filtreleme (birden fazla filtre varsa veya whereIn limiti aşıldıysa)
+            if (hasDistrictFilter) {
+                postList = postList.filter { post ->
+                    districts!!.contains(post.district)
+                }
             }
-
-            if (!status.isNullOrEmpty()) {
-                query = query.whereEqualTo("status", status)
+            
+            if (hasCategoryFilter) {
+                postList = postList.filter { post ->
+                    categories!!.contains(post.category)
+                }
             }
-
-            query = query.orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
-
-            val snapshot = query.get().await()
-            val postList = snapshot.documents.map { doc ->
-                val post = doc.toObject(Post::class.java)!!
-                post.copy(id = doc.id)
+            
+            if (hasStatusFilter) {
+                postList = postList.filter { post ->
+                    statuses!!.contains(post.status)
+                }
             }
 
             Resource.Success(postList)

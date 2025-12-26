@@ -26,13 +26,11 @@ class HomeViewModel @Inject constructor(
         get() = authRepository.currentUser?.uid ?: ""
 
     // Son seçilen filtreleri burada tutacağız
-    // private var yerine var yapıyoruz.
-    // Dışarıdan okunabilsin ama değiştirilebilsin (set işlemini zaten getPosts içinde yapıyoruz)
-    var lastDistrict: String? = null
+    var lastDistricts: List<String>? = null
         private set
-    var lastCategory: String? = null
+    var lastCategories: List<String>? = null
         private set
-    var lastStatus: String? = null
+    var lastStatuses: List<String>? = null
         private set
 
     init {
@@ -40,22 +38,26 @@ class HomeViewModel @Inject constructor(
     }
 
     // Verileri getiren fonksiyon
-    fun getPosts(district: String? = null, category: String? = null, status: String? = null) {
+    fun getPosts(
+        districts: List<String>? = null,
+        categories: List<String>? = null,
+        statuses: List<String>? = null
+    ) {
         // Gelen filtreleri hafızaya kaydet
-        lastDistrict = district
-        lastCategory = category
-        lastStatus = status
+        lastDistricts = districts
+        lastCategories = categories
+        lastStatuses = statuses
 
         viewModelScope.launch {
             _postsState.value = Resource.Loading()
-            val result = postRepository.getPosts(district, category, status)
+            val result = postRepository.getPosts(districts, categories, statuses)
             _postsState.value = result
         }
     }
 
     // Mevcut filtrelerle yenileme yap
     fun refreshPosts() {
-        getPosts(lastDistrict, lastCategory, lastStatus)
+        getPosts(lastDistricts, lastCategories, lastStatuses)
     }
 
     // Beğeni (Upvote) Fonksiyonu
@@ -88,7 +90,7 @@ class HomeViewModel @Inject constructor(
                 is Resource.Success -> {
                     android.util.Log.d("HomeViewModel", "toggleUpvote: Başarılı")
                     // Hafızadaki son filtrelerle tekrar çağırıyoruz ki ekran bozulmasın
-                    getPosts(lastDistrict, lastCategory, lastStatus)
+                    getPosts(lastDistricts, lastCategories, lastStatuses)
                 }
                 is Resource.Error -> {
                     android.util.Log.e("HomeViewModel", "toggleUpvote: Hata - ${result.message}")

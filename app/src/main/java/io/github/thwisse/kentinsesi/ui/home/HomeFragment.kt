@@ -54,9 +54,9 @@ class HomeFragment : Fragment() {
                     R.id.action_filter -> {
                         // Mevcut filtre değerlerini ViewModel'den al
                         val bundle = android.os.Bundle().apply {
-                            putString("district", viewModel.lastDistrict)
-                            putString("category", viewModel.lastCategory)
-                            putString("status", viewModel.lastStatus)
+                            viewModel.lastDistricts?.let { putStringArrayList("districts", ArrayList(it)) }
+                            viewModel.lastCategories?.let { putStringArrayList("categories", ArrayList(it)) }
+                            viewModel.lastStatuses?.let { putStringArrayList("statuses", ArrayList(it)) }
                         }
 
                         // BottomSheet'i bu verilerle aç
@@ -83,12 +83,16 @@ class HomeFragment : Fragment() {
 
         // Filtre ekranından gelen sonuçları dinle
         setFragmentResultListener("filter_request") { _, bundle ->
-            val district = bundle.getString("district")
-            val category = bundle.getString("category")
-            val status = bundle.getString("status")
+            val districts = bundle.getStringArrayList("districts")
+            val categories = bundle.getStringArrayList("categories")
+            val statuses = bundle.getStringArrayList("statuses")
 
             // Listeyi temizle (opsiyonel görsel iyileştirme) veya direkt yüklemeye geç
-            viewModel.getPosts(district, category, status)
+            viewModel.getPosts(
+                districts = districts?.toList(),
+                categories = categories?.toList(),
+                statuses = statuses?.toList()
+            )
 
             // Kullanıcıya bilgi ver
             Toast.makeText(requireContext(), "Filtreler uygulandı", Toast.LENGTH_SHORT).show()
