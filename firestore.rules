@@ -23,6 +23,26 @@ service cloud.firestore {
       return isAuthenticated() && 
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
+
+    function isValidPostStatus(status) {
+      return status in ['new', 'in_progress', 'resolved', 'rejected'];
+    }
+
+    function postAllowedKeys() {
+      return ['authorId', 'title', 'description', 'category', 'imageUrl', 'location', 'district', 'createdAt', 'status', 'upvoteCount', 'upvotedBy', 'commentCount'];
+    }
+
+    function hasOnlyPostAllowedKeys(data) {
+      return data.keys().hasOnly(postAllowedKeys());
+    }
+
+    function commentAllowedKeys() {
+      return ['authorId', 'authorFullName', 'authorUsername', 'authorCity', 'authorDistrict', 'authorTitle', 'text', 'parentCommentId', 'rootCommentId', 'depth', 'replyCount', 'replyToAuthorId', 'replyToAuthorFullName', 'replyToAuthorUsername', 'createdAt'];
+    }
+
+    function hasOnlyCommentAllowedKeys(data) {
+      return data.keys().hasOnly(commentAllowedKeys());
+    }
     
     // ========== USERS COLLECTION ==========
     match /users/{userId} {
@@ -70,7 +90,14 @@ service cloud.firestore {
       
       // Oluşturma: Giriş yapmış herkes post oluşturabilir
       allow create: if isAuthenticated() && 
-                       isOwner(request.resource.data.authorId);
+                       isOwner(request.resource.data.authorId) &&
+                       hasOnlyPostAllowedKeys(request.resource.data) &&
+                       request.resource.data.authorId is string &&
+                       request.resource.data.title is string &&
+                       request.resource.data.description is string &&
+                       request.resource.data.category is string &&
+                       request.resource.data.status is string &&
+                       isValidPostStatus(request.resource.data.status);
       
       // Güncelleme: 
       // - Post sahibi kendi postunu güncelleyebilir (title, description, category, status)
@@ -79,10 +106,12 @@ service cloud.firestore {
       allow update: if isAuthenticated() && (
         // Post sahibi belirli alanları güncelleyebilir (status dahil - kendi postunu çözüldü olarak işaretleyebilir)
         (isOwner(resource.data.authorId) && 
-         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description', 'category', 'imageUrl', 'status'])) ||
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description', 'category', 'imageUrl', 'status']) &&
+         (!('status' in request.resource.data) || isValidPostStatus(request.resource.data.status))) ||
         // Yetkili kullanıcılar sadece status'u güncelleyebilir
         (isOfficial() && 
-         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])) ||
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) &&
+         isValidPostStatus(request.resource.data.status)) ||
         // Herhangi bir giriş yapmış kullanıcı upvote yapabilir (upvotedBy ve upvoteCount)
         (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotedBy', 'upvoteCount'])) ||
         // Herhangi bir giriş yapmış kullanıcı commentCount'u +1 artırabilir
@@ -105,7 +134,15 @@ service cloud.firestore {
         
         // Oluşturma: Giriş yapmış herkes yorum yapabilir
         allow create: if isAuthenticated() && 
-                         isOwner(request.resource.data.authorId);
+                         isOwner(request.resource.data.authorId) &&
+                         hasOnlyCommentAllowedKeys(request.resource.data) &&
+                         request.resource.data.authorId is string &&
+                         request.resource.data.authorFullName is string &&
+                         request.resource.data.authorUsername is string &&
+                         request.resource.data.authorCity is string &&
+                         request.resource.data.authorDistrict is string &&
+                         request.resource.data.authorTitle is string &&
+                         request.resource.data.text is string;
         
         // Güncelleme: Sadece yorum sahibi güncelleyebilir
         allow update: if isAuthenticated() && (

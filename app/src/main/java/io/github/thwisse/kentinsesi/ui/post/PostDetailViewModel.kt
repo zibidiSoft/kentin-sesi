@@ -185,7 +185,7 @@ class PostDetailViewModel @Inject constructor(
         text: String,
         parentCommentId: String,
         replyToAuthorId: String?,
-        replyToAuthorName: String?
+        replyToAuthorFullName: String?
     ) {
         if (text.isBlank()) return
         viewModelScope.launch {
@@ -195,7 +195,7 @@ class PostDetailViewModel @Inject constructor(
                 text = text,
                 parentCommentId = parentCommentId,
                 replyToAuthorId = replyToAuthorId,
-                replyToAuthorName = replyToAuthorName
+                replyToAuthorFullName = replyToAuthorFullName
             )
             _addReplyState.value = result
             if (result is Resource.Success) getComments(postId)

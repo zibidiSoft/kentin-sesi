@@ -156,15 +156,10 @@ class HomeViewModel @Inject constructor(
             return // Kullanıcı yoksa işlem yapma
         }
 
-        // Post ID kontrolü - id veya postId kullan
-        // Önce id'yi kontrol et, boşsa postId'yi kullan
-        val postId = when {
-            post.id.isNotEmpty() -> post.id
-            post.postId.isNotEmpty() -> post.postId
-            else -> {
-                android.util.Log.e("HomeViewModel", "toggleUpvote: postId boş - post.id: '${post.id}', post.postId: '${post.postId}'")
-                return // Post ID yoksa işlem yapma
-            }
+        val postId = post.id
+        if (postId.isBlank()) {
+            android.util.Log.e("HomeViewModel", "toggleUpvote: postId boş - post.id: '${post.id}'")
+            return
         }
 
         android.util.Log.d("HomeViewModel", "toggleUpvote: postId=$postId, userId=$userId")

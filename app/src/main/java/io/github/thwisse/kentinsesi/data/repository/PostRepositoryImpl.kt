@@ -112,7 +112,8 @@ class PostRepositoryImpl @Inject constructor(
                 
                 val postList = snapshot.documents.map { doc ->
                     val post = doc.toObject(Post::class.java)!!
-                    post.copy(id = doc.id)
+                    // @DocumentId normalde id'yi doldurur; yine de boş gelirse doc.id ile dolduralım
+                    if (post.id.isBlank()) post.copy(id = doc.id) else post
                 }
                 return Resource.Success(postList)
             }
@@ -140,7 +141,7 @@ class PostRepositoryImpl @Inject constructor(
                     val snapshot = query.get().await()
                     postList = snapshot.documents.map { doc ->
                         val post = doc.toObject(Post::class.java)!!
-                        post.copy(id = doc.id)
+                        if (post.id.isBlank()) post.copy(id = doc.id) else post
                     }
                     // whereIn 10'dan fazla item için kullanılamaz, client-side filtrele
                     if (districts.size > 10) {
@@ -159,7 +160,7 @@ class PostRepositoryImpl @Inject constructor(
                     val snapshot = query.get().await()
                     postList = snapshot.documents.map { doc ->
                         val post = doc.toObject(Post::class.java)!!
-                        post.copy(id = doc.id)
+                        if (post.id.isBlank()) post.copy(id = doc.id) else post
                     }
                     if (categories.size > 10) {
                         postList = postList.filter { categories.contains(it.category) }
@@ -177,7 +178,7 @@ class PostRepositoryImpl @Inject constructor(
                     val snapshot = query.get().await()
                     postList = snapshot.documents.map { doc ->
                         val post = doc.toObject(Post::class.java)!!
-                        post.copy(id = doc.id)
+                        if (post.id.isBlank()) post.copy(id = doc.id) else post
                     }
                     if (statuses.size > 10) {
                         postList = postList.filter { statuses.contains(it.status) }
@@ -191,7 +192,7 @@ class PostRepositoryImpl @Inject constructor(
                         .await()
                     postList = snapshot.documents.map { doc ->
                         val post = doc.toObject(Post::class.java)!!
-                        post.copy(id = doc.id)
+                        if (post.id.isBlank()) post.copy(id = doc.id) else post
                     }
                 }
             }
@@ -299,9 +300,7 @@ class PostRepositoryImpl @Inject constructor(
             val title = profile?.title ?: ""
 
             val comment = Comment(
-                postId = postId,
                 authorId = user.uid,
-                authorName = fullName,
                 authorFullName = fullName,
                 authorUsername = username,
                 authorCity = city,
@@ -329,7 +328,7 @@ class PostRepositoryImpl @Inject constructor(
         text: String,
         parentCommentId: String,
         replyToAuthorId: String?,
-        replyToAuthorName: String?
+        replyToAuthorFullName: String?
     ): Resource<Unit> {
         return try {
             val user = auth.currentUser ?: throw Exception("Oturum açılmamış.")
@@ -369,19 +368,13 @@ class PostRepositoryImpl @Inject constructor(
                 parent.rootCommentId ?: parent.id
             }
 
-            val replyToNameResolved = replyToAuthorName?.takeIf { it.isNotBlank() }
+            val replyToFullNameResolved = replyToAuthorFullName?.takeIf { it.isNotBlank() }
                 ?: parent.authorFullName.takeIf { it.isNotBlank() }
-                ?: parent.authorName.takeIf { it.isNotBlank() }
-
-            val replyToFullNameResolved = parent.authorFullName.takeIf { it.isNotBlank() }
-                ?: parent.authorName.takeIf { it.isNotBlank() }
 
             val replyToUsernameResolved = parent.authorUsername.takeIf { it.isNotBlank() }
 
             val reply = Comment(
-                postId = postId,
                 authorId = user.uid,
-                authorName = fullName,
                 authorFullName = fullName,
                 authorUsername = username,
                 authorCity = city,
@@ -392,7 +385,6 @@ class PostRepositoryImpl @Inject constructor(
                 rootCommentId = rootId,
                 depth = parent.depth + 1,
                 replyToAuthorId = replyToAuthorId,
-                replyToAuthorName = replyToNameResolved,
                 replyToAuthorFullName = replyToFullNameResolved,
                 replyToAuthorUsername = replyToUsernameResolved
             )
@@ -452,7 +444,7 @@ class PostRepositoryImpl @Inject constructor(
 
             val postList = snapshot.documents.map { doc ->
                 val post = doc.toObject(Post::class.java)!!
-                post.copy(id = doc.id)
+                if (post.id.isBlank()) post.copy(id = doc.id) else post
             }
             Resource.Success(postList)
         } catch (e: Exception) {
@@ -470,7 +462,7 @@ class PostRepositoryImpl @Inject constructor(
             if (document.exists()) {
                 val post = document.toObject(Post::class.java)
                 if (post != null) {
-                    Resource.Success(post.copy(id = document.id))
+                    Resource.Success(if (post.id.isBlank()) post.copy(id = document.id) else post)
                 } else {
                     Resource.Error("Post verisi okunamadı.")
                 }

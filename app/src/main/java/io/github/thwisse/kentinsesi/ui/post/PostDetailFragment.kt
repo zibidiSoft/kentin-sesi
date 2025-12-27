@@ -152,7 +152,7 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
         replyingTo = comment
         binding.replyBanner.isVisible = true
         val name = comment.authorFullName
-            .ifBlank { comment.authorName }
+            .ifBlank { comment.authorFullName }
             .ifBlank { "-" }
         binding.tvReplyBannerText.text = "${name} kişisine yanıt"
         binding.etComment.hint = "Yanıt yaz..."
@@ -528,7 +528,7 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
                     text = text,
                     parentCommentId = replying.id,
                     replyToAuthorId = replying.authorId,
-                    replyToAuthorName = replying.authorName
+                    replyToAuthorFullName = replying.authorFullName
                 )
             } else {
                 viewModel.addComment(postId, text)

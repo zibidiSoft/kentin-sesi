@@ -1,13 +1,13 @@
 package io.github.thwisse.kentinsesi.data.model
 
+import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
 
 data class Comment(
+    @DocumentId
     val id: String = "",
-    val postId: String = "",
     val authorId: String = "",
-    val authorName: String = "", // Geriye uyumluluk için (eski yorumlar)
     val authorFullName: String = "",
     val authorUsername: String = "",
     val authorCity: String = "",
@@ -21,7 +21,6 @@ data class Comment(
     val depth: Int = 0, // 0=top-level, 1=reply, 2=reply-to-reply (max)
     val replyCount: Long = 0L, // Only meaningful for top-level comments
     val replyToAuthorId: String? = null,
-    val replyToAuthorName: String? = null,
     val replyToAuthorFullName: String? = null,
     val replyToAuthorUsername: String? = null,
 

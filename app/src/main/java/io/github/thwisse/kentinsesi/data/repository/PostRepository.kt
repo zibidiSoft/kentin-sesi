@@ -38,7 +38,7 @@ interface PostRepository {
         text: String,
         parentCommentId: String,
         replyToAuthorId: String?,
-        replyToAuthorName: String?
+        replyToAuthorFullName: String?
     ): Resource<Unit>
 
     suspend fun updatePostStatus(postId: String, newStatus: String): Resource<Unit>

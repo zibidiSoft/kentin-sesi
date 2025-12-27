@@ -2,6 +2,7 @@ package io.github.thwisse.kentinsesi.data.model
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ServerTimestamp
 import kotlinx.parcelize.RawValue
@@ -15,9 +16,8 @@ import kotlinx.parcelize.RawValue
  * - Navigation'da postId kullanılıyor, Post direkt gönderilmiyor
  */
 data class Post(
-    val id: String = "", // Firestore Document ID'si
     @DocumentId
-    val postId: String = "",
+    val id: String = "", // Firestore Document ID'si
 
     val authorId: String = "", // Gönderiyi oluşturan kullanıcının UID'si
     val title: String = "",
@@ -43,18 +43,21 @@ data class Post(
      * Status'u enum olarak döndürür - Kod içinde kullanım için
      * Örnek: if (post.statusEnum == PostStatus.RESOLVED) { ... }
      */
+    @get:Exclude
     val statusEnum: PostStatus
         get() = PostStatus.fromString(status)
     
     /**
      * Post'un çözülüp çözülmediğini kontrol eder
      */
+    @get:Exclude
     val isResolved: Boolean
         get() = statusEnum == PostStatus.RESOLVED
     
     /**
      * Post'un yeni olup olmadığını kontrol eder
      */
+    @get:Exclude
     val isNew: Boolean
         get() = statusEnum == PostStatus.NEW
 }
