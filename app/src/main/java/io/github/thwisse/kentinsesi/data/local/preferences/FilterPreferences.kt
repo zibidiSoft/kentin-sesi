@@ -2,6 +2,7 @@ package io.github.thwisse.kentinsesi.data.local.preferences
 
 import android.content.Context
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -18,6 +19,8 @@ class FilterPreferences @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val LAST_APPLIED_PRESET_ID = stringPreferencesKey("last_applied_preset_id")
+
+    private val EXAMPLE_PRESET_CREATED = booleanPreferencesKey("example_preset_created")
 
     private val LAST_DISTRICTS = stringSetPreferencesKey("last_filter_districts")
     private val LAST_CATEGORIES = stringSetPreferencesKey("last_filter_categories")
@@ -41,7 +44,11 @@ class FilterPreferences @Inject constructor(
                     statuses = statuses?.toList().orEmpty()
                 )
             }
+
         }
+
+    val examplePresetCreated: Flow<Boolean> = context.filterDataStore.data
+        .map { prefs: Preferences -> prefs[EXAMPLE_PRESET_CREATED] ?: false }
 
     suspend fun setLastAppliedPresetId(id: String?) {
         context.filterDataStore.edit { prefs ->
@@ -50,6 +57,12 @@ class FilterPreferences @Inject constructor(
             } else {
                 prefs[LAST_APPLIED_PRESET_ID] = id
             }
+        }
+    }
+
+    suspend fun setExamplePresetCreated(created: Boolean) {
+        context.filterDataStore.edit { prefs ->
+            prefs[EXAMPLE_PRESET_CREATED] = created
         }
     }
 

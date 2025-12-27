@@ -3,10 +3,12 @@ package io.github.thwisse.kentinsesi.ui.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.thwisse.kentinsesi.data.model.Post
 import io.github.thwisse.kentinsesi.data.model.FilterCriteria
+import io.github.thwisse.kentinsesi.data.model.FilterPreset
 import io.github.thwisse.kentinsesi.data.repository.AuthRepository
 import io.github.thwisse.kentinsesi.data.repository.FilterRepository
 import io.github.thwisse.kentinsesi.data.repository.PostRepository
@@ -25,6 +27,8 @@ class HomeViewModel @Inject constructor(
     private val _postsState = MutableLiveData<Resource<List<Post>>>()
     val postsState: LiveData<Resource<List<Post>>> = _postsState
 
+    val presets: LiveData<List<FilterPreset>> = filterRepository.observePresets().asLiveData()
+
     // Kullanıcının kendi ID'si (Adapter'a göndermek için lazım)
     val currentUserId: String
         get() = authRepository.currentUser?.uid ?: ""
@@ -41,15 +45,14 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             filterRepository.ensureSystemDefaultExists()
 
-            val presetId = filterRepository.observeLastAppliedPresetId().first()
-            val preset = presetId?.let { filterRepository.getPresetById(it) }
-
-            val criteria = when {
-                preset != null -> preset.criteria
-                else -> filterRepository.observeLastCriteria().first()
-                    ?: filterRepository.getDefaultPreset()?.criteria
-                    ?: FilterCriteria()
-            }
+            val criteria = filterRepository.getDefaultPreset()?.criteria
+                ?: run {
+                    val presetId = filterRepository.observeLastAppliedPresetId().first()
+                    val preset = presetId?.let { filterRepository.getPresetById(it) }
+                    preset?.criteria
+                }
+                ?: filterRepository.observeLastCriteria().first()
+                ?: FilterCriteria()
 
             applyCriteriaInternal(criteria)
         }
@@ -73,6 +76,48 @@ class HomeViewModel @Inject constructor(
             filterRepository.setLastCriteria(criteria)
             applyCriteriaInternal(criteria)
         }
+    }
+
+    fun applyPreset(presetId: String) {
+        viewModelScope.launch {
+            val preset = filterRepository.getPresetById(presetId)
+                ?: return@launch
+
+            filterRepository.setLastAppliedPresetId(preset.id)
+            filterRepository.setLastCriteria(null)
+            applyCriteriaInternal(preset.criteria)
+        }
+    }
+
+    fun setDefaultPreset(presetId: String) {
+        viewModelScope.launch {
+            val result = filterRepository.setDefaultPreset(presetId)
+            if (result is Resource.Error) {
+                android.util.Log.e("HomeViewModel", "setDefaultPreset: ${result.message}")
+            }
+        }
+    }
+
+    fun deletePreset(presetId: String) {
+        viewModelScope.launch {
+            val result = filterRepository.deletePreset(presetId)
+            if (result is Resource.Error) {
+                android.util.Log.e("HomeViewModel", "deletePreset: ${result.message}")
+            }
+        }
+    }
+
+    fun savePreset(name: String, criteria: FilterCriteria) {
+        viewModelScope.launch {
+            val result = filterRepository.savePreset(name, criteria)
+            if (result is Resource.Error) {
+                android.util.Log.e("HomeViewModel", "savePreset: ${result.message}")
+            }
+        }
+    }
+
+    suspend fun savePresetNow(name: String, criteria: FilterCriteria): Resource<Unit> {
+        return filterRepository.savePreset(name, criteria)
     }
 
     private suspend fun applyCriteriaInternal(criteria: FilterCriteria) {

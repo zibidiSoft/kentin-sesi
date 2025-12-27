@@ -113,7 +113,7 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback, GoogleM
             .setItems(items) { _, which ->
                 when (which) {
                     0 -> {
-                        Toast.makeText(requireContext(), "Filtrelerim ekranı yakında eklenecek", Toast.LENGTH_SHORT).show()
+                        findNavController().navigate(R.id.filterPresetsBottomSheetFragment)
                     }
                     1 -> {
                         val bundle = Bundle().apply {

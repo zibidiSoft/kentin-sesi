@@ -17,6 +17,9 @@
             android:id="@+id/action_homeFragment_to_filterBottomSheetFragment"
             app:destination="@id/filterBottomSheetFragment" />
         <action
+            android:id="@+id/action_homeFragment_to_filterPresetsBottomSheetFragment"
+            app:destination="@id/filterPresetsBottomSheetFragment" />
+        <action
             android:id="@+id/action_homeFragment_to_postDetailFragment"
             app:destination="@id/postDetailFragment" />
     </fragment>
@@ -34,6 +37,9 @@
         <action
             android:id="@+id/action_nav_map_to_filterBottomSheetFragment"
             app:destination="@id/filterBottomSheetFragment" />
+        <action
+            android:id="@+id/action_nav_map_to_filterPresetsBottomSheetFragment"
+            app:destination="@id/filterPresetsBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/nav_notifications"
@@ -76,6 +82,11 @@
         android:name="io.github.thwisse.kentinsesi.ui.home.FilterBottomSheetFragment"
         android:label="Filtrele"
         tools:layout="@layout/fragment_filter_bottom_sheet" />
+    <dialog
+        android:id="@+id/filterPresetsBottomSheetFragment"
+        android:name="io.github.thwisse.kentinsesi.ui.home.FilterPresetsBottomSheetFragment"
+        android:label="Filtrelerim"
+        tools:layout="@layout/fragment_filter_presets_bottom_sheet" />
     <fragment
         android:id="@+id/locationPickerFragment"
         android:name="io.github.thwisse.kentinsesi.ui.map.LocationPickerFragment"

@@ -4,18 +4,29 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.Toast
 import androidx.core.os.bundleOf
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
+import io.github.thwisse.kentinsesi.data.model.FilterCriteria
 import io.github.thwisse.kentinsesi.databinding.DialogFilterOptionsBinding
 import io.github.thwisse.kentinsesi.databinding.FragmentFilterBottomSheetBinding
+import io.github.thwisse.kentinsesi.util.Resource
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class FilterBottomSheetFragment : BottomSheetDialogFragment() {
 
     private var _binding: FragmentFilterBottomSheetBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: HomeViewModel by activityViewModels()
 
     // Seçilen filtreler
     private var selectedDistricts = mutableSetOf<String>()
@@ -57,6 +68,46 @@ class FilterBottomSheetFragment : BottomSheetDialogFragment() {
         binding.btnApplyFilter.setOnClickListener {
             applyFilters()
         }
+
+        binding.btnSavePreset.setOnClickListener {
+            showSavePresetDialog()
+        }
+    }
+
+    private fun showSavePresetDialog() {
+        val input = EditText(requireContext()).apply {
+            hint = "Filtre adı"
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Filtreyi kaydet")
+            .setView(input)
+            .setNegativeButton("İptal", null)
+            .setPositiveButton("Kaydet") { _, _ ->
+                val name = input.text?.toString().orEmpty().trim()
+
+                val criteria = FilterCriteria(
+                    districts = selectedDistricts.toList(),
+                    categories = selectedCategories.toList(),
+                    statuses = selectedStatuses.toList()
+                )
+
+                viewLifecycleOwner.lifecycleScope.launch {
+                    when (val result = viewModel.savePresetNow(name, criteria)) {
+                        is Resource.Success -> {
+                            Toast.makeText(requireContext(), "Filtre kaydedildi", Toast.LENGTH_SHORT).show()
+                            dismiss()
+                        }
+                        is Resource.Error -> {
+                            Toast.makeText(requireContext(), result.message ?: "Filtre kaydedilemedi", Toast.LENGTH_SHORT).show()
+                        }
+                        is Resource.Loading -> {
+                            // no-op
+                        }
+                    }
+                }
+            }
+            .show()
     }
 
     private fun setupClickListeners() {

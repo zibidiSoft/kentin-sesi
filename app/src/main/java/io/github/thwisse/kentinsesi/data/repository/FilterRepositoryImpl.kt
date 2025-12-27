@@ -8,6 +8,7 @@ import io.github.thwisse.kentinsesi.data.model.FilterCriteria
 import io.github.thwisse.kentinsesi.data.model.FilterPreset
 import io.github.thwisse.kentinsesi.util.Resource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.util.UUID
 import javax.inject.Inject
@@ -19,7 +20,7 @@ class FilterRepositoryImpl @Inject constructor(
 
     companion object {
         const val SYSTEM_DEFAULT_ID = "system_default"
-        const val SYSTEM_DEFAULT_NAME = "Varsayılan filtre"
+        const val SYSTEM_DEFAULT_NAME = "Ana Filtre"
     }
 
     override fun observePresets(): Flow<List<FilterPreset>> {
@@ -28,8 +29,12 @@ class FilterRepositoryImpl @Inject constructor(
 
     override suspend fun ensureSystemDefaultExists(): Resource<Unit> {
         return try {
+            val alreadyCreated = prefs.examplePresetCreated.first()
+            if (alreadyCreated) return Resource.Success(Unit)
+
             val existing = dao.getSystemDefault()
             if (existing != null) {
+                prefs.setExamplePresetCreated(true)
                 return Resource.Success(Unit)
             }
 
@@ -44,6 +49,7 @@ class FilterRepositoryImpl @Inject constructor(
             )
 
             dao.insert(systemDefault)
+            prefs.setExamplePresetCreated(true)
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Varsayılan filtre oluşturulamadı")
@@ -75,14 +81,14 @@ class FilterRepositoryImpl @Inject constructor(
     override suspend fun deletePreset(id: String): Resource<Unit> {
         return try {
             val preset = dao.getById(id) ?: return Resource.Success(Unit)
-            if (preset.isSystemDefault) {
-                return Resource.Error("Varsayılan filtre silinemez")
-            }
 
             dao.deleteById(id)
 
-            val lastId = prefs.lastAppliedPresetId
-            // lastAppliedPresetId flow; no sync read here, Home/Map will resolve fallback on missing preset
+            val lastAppliedId = prefs.lastAppliedPresetId.first()
+            if (lastAppliedId == id) {
+                prefs.setLastAppliedPresetId(null)
+            }
+
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Filtre silinemedi")
@@ -94,6 +100,11 @@ class FilterRepositoryImpl @Inject constructor(
             val preset = dao.getById(id) ?: return Resource.Error("Filtre bulunamadı")
             dao.clearDefaultFlag()
             dao.setDefaultFlag(preset.id)
+
+            // Default seçildiyse uygulama restart'ta bununla başlasın
+            prefs.setLastAppliedPresetId(preset.id)
+            prefs.setLastCriteria(null)
+
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Varsayılan filtre ayarlanamadı")

@@ -70,7 +70,7 @@ class HomeFragment : Fragment() {
             .setItems(items) { _, which ->
                 when (which) {
                     0 -> {
-                        Toast.makeText(requireContext(), "Filtrelerim ekranı yakında eklenecek", Toast.LENGTH_SHORT).show()
+                        findNavController().navigate(R.id.filterPresetsBottomSheetFragment)
                     }
                     1 -> {
                         val bundle = android.os.Bundle().apply {

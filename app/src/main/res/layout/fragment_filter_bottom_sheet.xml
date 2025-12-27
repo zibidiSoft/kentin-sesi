@@ -139,13 +139,30 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <Button
-        android:id="@+id/btnApplyFilter"
+    <LinearLayout
+        android:id="@+id/layoutFilterActions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="Filtreleri Uygula"
+        android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/cvStatus"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/btnSavePreset"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Kaydet" />
+
+        <Button
+            android:id="@+id/btnApplyFilter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Uygula" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
