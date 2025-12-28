@@ -1,29 +1,73 @@
 <resources>
     <string name="app_name">Kentin Sesi</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="yeni_bildirim_olustur">Yeni Paylaşım Oluştur</string>
-    <string name="e_posta">E-posta</string>
-    <string name="sifre">Şifre</string>
-    <string name="giris_yap">Giriş Yap</string>
-    <string name="hesabin_yok_mu_kayit_ol">Hesabın yok mu? Kayıt Ol</string>
-    <string name="ana_akis">Ana Akış</string>
-    <string name="harita">Harita</string>
-    <string name="bildirimler">Bildirimler</string>
-    <string name="profil">Profil</string>
+    <string name="yeni_bildirim_olustur">Create New Post</string>
+    <string name="e_posta">Email</string>
+    <string name="sifre">Password</string>
+    <string name="giris_yap">Sign In</string>
+    <string name="hesabin_yok_mu_kayit_ol">Don’t have an account? Sign Up</string>
+    <string name="ana_akis">Feed</string>
+    <string name="harita">Map</string>
+    <string name="bildirimler">Notifications</string>
+    <string name="profil">Profile</string>
 
-    <string name="location_selected">Konum Seçildi: %1$.4f, %2$.4f</string>
-    <string name="post_support_count">%1$d Destek</string>
-    <string name="post_comment_count">%1$d Yorum</string>
+    <string name="location_selected">Location selected: %1$.4f, %2$.4f</string>
+    <string name="post_support_count">%1$d Supports</string>
+    <string name="post_comment_count">%1$d Comments</string>
     <string name="post_location_city_district">Hatay, %1$s</string>
-    <string name="post_status_new">Yeni</string>
-    <string name="post_status_in_progress">İşlemde</string>
-    <string name="post_status_resolved">Çözüldü</string>
+    <string name="post_status_new">New</string>
+    <string name="post_status_in_progress">In progress</string>
+    <string name="post_status_resolved">Resolved</string>
 
-    <string name="anonymous_user">Anonim</string>
-    <string name="reply_to_person">%1$s kişisine yanıt</string>
-    <string name="replies_count">%1$d yanıt</string>
-    <string name="just_now">Az önce</string>
-    <string name="reply_write_hint">Yanıt yaz…</string>
-    <string name="comment_write_hint">Bir yorum yaz…</string>
-    <string name="comments_header">Yorumlar (%1$d yorum)</string>
+    <string name="anonymous_user">Anonymous</string>
+    <string name="reply_to_person">Reply to %1$s</string>
+    <string name="replies_count">%1$d replies</string>
+    <string name="just_now">Just now</string>
+    <string name="reply_write_hint">Write a reply…</string>
+    <string name="comment_write_hint">Write a comment…</string>
+    <string name="comments_header">Comments (%1$d)</string>
+
+    <string name="cd_post_image">Post image</string>
+    <string name="cd_selected_photo">Selected photo</string>
+
+    <string name="cd_post_title_input">Title</string>
+    <string name="cd_post_description_input">Description</string>
+    <string name="cd_profile_full_name_input">Full name</string>
+    <string name="cd_profile_username_input">Username</string>
+
+    <string name="cd_close">Close</string>
+    <string name="cd_send">Send</string>
+    <string name="cd_menu">Menu</string>
+
+    <string name="create_post_change_photo_hint">Tap to change photo</string>
+    <string name="create_post_title_hint">Title (e.g., Pothole issue)</string>
+    <string name="create_post_district_hint">Select district</string>
+    <string name="create_post_category_hint">Category</string>
+    <string name="create_post_description_hint">Detailed description</string>
+    <string name="create_post_location_waiting">Location: waiting…</string>
+    <string name="create_post_select_location">Select location from map</string>
+    <string name="create_post_share">Share</string>
+    <string name="district_iskenderun">İskenderun</string>
+
+    <string name="filter_title">Filter posts</string>
+    <string name="filter_district">District</string>
+    <string name="filter_category">Category</string>
+    <string name="filter_status">Status</string>
+    <string name="filter_all">All</string>
+    <string name="filter_only_my_posts">Only my posts</string>
+    <string name="filter_save">Save</string>
+    <string name="filter_apply">Apply</string>
+
+    <string name="setup_profile_title">Complete your profile</string>
+    <string name="setup_profile_subtitle">To provide a better service, we need to know you.</string>
+    <string name="setup_profile_full_name_hint">Full name</string>
+    <string name="setup_profile_username_hint">Username</string>
+    <string name="setup_profile_city_hint">City</string>
+    <string name="setup_profile_district_hint">District</string>
+    <string name="setup_profile_save_continue">Save and continue</string>
+    <string name="city_hatay">Hatay</string>
+
+    <string name="post_detail_support">Support</string>
+    <string name="post_detail_description">Description</string>
+    <string name="comments_header_initial">Comments (0)</string>
 </resources>

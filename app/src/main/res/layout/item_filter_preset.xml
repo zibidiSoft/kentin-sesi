@@ -44,7 +44,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="@android:color/transparent"
-            android:contentDescription="Menü"
+            android:contentDescription="@string/cd_menu"
             android:src="@android:drawable/ic_menu_more"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

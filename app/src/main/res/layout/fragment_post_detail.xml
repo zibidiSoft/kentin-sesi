@@ -32,6 +32,7 @@
                 android:layout_height="250dp"
                 android:scaleType="centerCrop"
                 android:background="#EEEEEE"
+                android:contentDescription="@string/cd_post_image"
                 tools:src="@tools:sample/backgrounds/scenic" />
 
             <LinearLayout
@@ -112,14 +113,14 @@
                         android:id="@+id/btnDetailUpvote"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Destekle" />
+                        android:text="@string/post_detail_support" />
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:text="Açıklama"
+                    android:text="@string/post_detail_description"
                     android:textStyle="bold"
                     android:textColor="@color/black"/>
 
@@ -225,7 +226,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="0 yorum"
+                            android:text="@string/comments_header_initial"
                             android:textStyle="bold"
                             android:textColor="@color/black"
                             android:textSize="16sp" />
@@ -281,6 +282,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_close"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
             app:tint="?attr/colorPrimary" />
 
@@ -304,7 +306,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/bg_category_tag"
-            android:hint="Bir yorum yaz..."
+            android:hint="@string/comment_write_hint"
+            android:inputType="textMultiLine"
+            android:importantForAutofill="no"
             android:padding="12dp"
             android:maxLines="3"
             android:textSize="14sp" />
@@ -315,6 +319,7 @@
             android:layout_height="48dp"
             android:layout_marginStart="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_send"
             android:src="@android:drawable/ic_menu_send"
             app:tint="?attr/colorPrimary" />
     </LinearLayout>

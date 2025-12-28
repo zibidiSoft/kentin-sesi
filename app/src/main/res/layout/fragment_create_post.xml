@@ -25,6 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:background="#E0E0E0"
+                android:contentDescription="@string/cd_selected_photo"
                 android:scaleType="centerCrop"
                 android:src="@android:drawable/ic_menu_camera"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -32,7 +33,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Fotoğraf Değiştirmek İçin Tıklayın"
+                android:text="@string/create_post_change_photo_hint"
                 android:textColor="#757575"
                 android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="@id/ivPostImage"
@@ -45,13 +46,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:hint="Başlık (Örn: Çukur Sorunu)"
+                android:hint="@string/create_post_title_hint"
                 app:layout_constraintTop_toBottomOf="@id/ivPostImage">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etTitle"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/cd_post_title_input" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -60,7 +62,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="İlçe Seçiniz"
+                android:hint="@string/create_post_district_hint"
                 app:layout_constraintTop_toBottomOf="@id/tilTitle">
 
                 <AutoCompleteTextView
@@ -68,7 +70,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="none"
-                    android:text="İskenderun" />
+                    android:text="@string/district_iskenderun" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -77,7 +79,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Kategori"
+                android:hint="@string/create_post_category_hint"
                 app:layout_constraintTop_toBottomOf="@id/tilDistrict">
 
                 <AutoCompleteTextView
@@ -93,13 +95,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Detaylı Açıklama"
+                android:hint="@string/create_post_description_hint"
                 app:layout_constraintTop_toBottomOf="@id/tilCategory">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etDescription"
                     android:layout_width="match_parent"
                     android:layout_height="100dp"
+                    android:contentDescription="@string/cd_post_description_input"
                     android:gravity="top"
                     android:inputType="textMultiLine" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -110,7 +113,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:drawablePadding="8dp"
-                android:text="Konum: Bekleniyor..."
+                android:text="@string/create_post_location_waiting"
                 app:drawableStartCompat="@android:drawable/ic_menu_mylocation"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tilDescription" />
@@ -120,7 +123,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Haritadan Konum Seç"
+                android:text="@string/create_post_select_location"
                 android:backgroundTint="#FF9800"
                 app:icon="@android:drawable/ic_dialog_map"
                 app:layout_constraintStart_toStartOf="parent"
@@ -130,7 +133,7 @@
                 android:id="@+id/btnShare"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Paylaş"
+                android:text="@string/create_post_share"
                 app:layout_constraintTop_toBottomOf="@+id/btnSelectLocation"
                 tools:layout_editor_absoluteX="16dp" />
 

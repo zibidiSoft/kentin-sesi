@@ -9,7 +9,7 @@
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Paylaşımları Filtrele"
+        android:text="@string/filter_title"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@color/black"
@@ -36,7 +36,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="İlçe"
+                android:text="@string/filter_district"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -44,7 +44,7 @@
                 android:id="@+id/tvDistrictSummary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tümü"
+                android:text="@string/filter_all"
                 android:textSize="14sp"
                 android:textColor="#666"
                 android:layout_marginEnd="8dp" />
@@ -52,6 +52,7 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:contentDescription="@null"
                 android:src="@android:drawable/ic_menu_more"
                 app:tint="#666" />
         </LinearLayout>
@@ -62,7 +63,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:text="Sadece benim paylaşımlarım"
+        android:text="@string/filter_only_my_posts"
         app:layout_constraintTop_toBottomOf="@id/cvStatus"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -87,7 +88,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Kategori"
+                android:text="@string/filter_category"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -95,7 +96,7 @@
                 android:id="@+id/tvCategorySummary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tümü"
+                android:text="@string/filter_all"
                 android:textSize="14sp"
                 android:textColor="#666"
                 android:layout_marginEnd="8dp" />
@@ -103,6 +104,7 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:contentDescription="@null"
                 android:src="@android:drawable/ic_menu_more"
                 app:tint="#666" />
         </LinearLayout>
@@ -128,7 +130,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Durum"
+                android:text="@string/filter_status"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -136,7 +138,7 @@
                 android:id="@+id/tvStatusSummary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tümü"
+                android:text="@string/filter_all"
                 android:textSize="14sp"
                 android:textColor="#666"
                 android:layout_marginEnd="8dp" />
@@ -144,6 +146,7 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:contentDescription="@null"
                 android:src="@android:drawable/ic_menu_more"
                 app:tint="#666" />
         </LinearLayout>
@@ -164,14 +167,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:text="Kaydet" />
+            android:text="@string/filter_save" />
 
         <Button
             android:id="@+id/btnApplyFilter"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Uygula" />
+            android:text="@string/filter_apply" />
 
     </LinearLayout>
 

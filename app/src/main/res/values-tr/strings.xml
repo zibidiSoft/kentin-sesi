@@ -1,0 +1,73 @@
+<resources>
+    <string name="app_name">Kentin Sesi</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="yeni_bildirim_olustur">Yeni Paylaşım Oluştur</string>
+    <string name="e_posta">E-posta</string>
+    <string name="sifre">Şifre</string>
+    <string name="giris_yap">Giriş Yap</string>
+    <string name="hesabin_yok_mu_kayit_ol">Hesabın yok mu? Kayıt Ol</string>
+    <string name="ana_akis">Ana Akış</string>
+    <string name="harita">Harita</string>
+    <string name="bildirimler">Bildirimler</string>
+    <string name="profil">Profil</string>
+
+    <string name="location_selected">Konum Seçildi: %1$.4f, %2$.4f</string>
+    <string name="post_support_count">%1$d Destek</string>
+    <string name="post_comment_count">%1$d Yorum</string>
+    <string name="post_location_city_district">Hatay, %1$s</string>
+    <string name="post_status_new">Yeni</string>
+    <string name="post_status_in_progress">İşlemde</string>
+    <string name="post_status_resolved">Çözüldü</string>
+
+    <string name="anonymous_user">Anonim</string>
+    <string name="reply_to_person">%1$s kişisine yanıt</string>
+    <string name="replies_count">%1$d yanıt</string>
+    <string name="just_now">Az önce</string>
+    <string name="reply_write_hint">Yanıt yaz…</string>
+    <string name="comment_write_hint">Bir yorum yaz…</string>
+    <string name="comments_header">Yorumlar (%1$d yorum)</string>
+
+    <string name="cd_post_image">Paylaşım görseli</string>
+    <string name="cd_selected_photo">Seçilen fotoğraf</string>
+
+    <string name="cd_post_title_input">Başlık</string>
+    <string name="cd_post_description_input">Açıklama</string>
+    <string name="cd_profile_full_name_input">Ad soyad</string>
+    <string name="cd_profile_username_input">Kullanıcı adı</string>
+
+    <string name="cd_close">Kapat</string>
+    <string name="cd_send">Gönder</string>
+    <string name="cd_menu">Menü</string>
+
+    <string name="create_post_change_photo_hint">Fotoğrafı değiştirmek için tıklayın</string>
+    <string name="create_post_title_hint">Başlık (Örn: Çukur sorunu)</string>
+    <string name="create_post_district_hint">İlçe seçiniz</string>
+    <string name="create_post_category_hint">Kategori</string>
+    <string name="create_post_description_hint">Detaylı açıklama</string>
+    <string name="create_post_location_waiting">Konum: Bekleniyor…</string>
+    <string name="create_post_select_location">Haritadan konum seç</string>
+    <string name="create_post_share">Paylaş</string>
+    <string name="district_iskenderun">İskenderun</string>
+
+    <string name="filter_title">Paylaşımları filtrele</string>
+    <string name="filter_district">İlçe</string>
+    <string name="filter_category">Kategori</string>
+    <string name="filter_status">Durum</string>
+    <string name="filter_all">Tümü</string>
+    <string name="filter_only_my_posts">Sadece benim paylaşımlarım</string>
+    <string name="filter_save">Kaydet</string>
+    <string name="filter_apply">Uygula</string>
+
+    <string name="setup_profile_title">Profilini tamamla</string>
+    <string name="setup_profile_subtitle">Daha iyi bir hizmet için seni tanımalıyız.</string>
+    <string name="setup_profile_full_name_hint">Ad soyad</string>
+    <string name="setup_profile_username_hint">Kullanıcı adı</string>
+    <string name="setup_profile_city_hint">Şehir</string>
+    <string name="setup_profile_district_hint">İlçe</string>
+    <string name="setup_profile_save_continue">Kaydet ve devam et</string>
+    <string name="city_hatay">Hatay</string>
+
+    <string name="post_detail_support">Destekle</string>
+    <string name="post_detail_description">Açıklama</string>
+    <string name="comments_header_initial">Yorumlar (0 yorum)</string>
+</resources>
