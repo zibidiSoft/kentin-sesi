@@ -473,4 +473,22 @@ class PostRepositoryImpl @Inject constructor(
             Resource.Error(e.message ?: "Post alınamadı.")
         }
     }
+    
+    override suspend fun getUserComments(userId: String): Resource<List<Comment>> {
+        return try {
+            // Collection group query - tüm posts altındaki comments subcollection'larını tarar
+            val snapshot = firestore.collectionGroup(Constants.COLLECTION_COMMENTS)
+                .whereEqualTo("authorId", userId)
+                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .get()
+                .await()
+            
+            val comments = snapshot.documents.mapNotNull { doc ->
+                doc.toObject(Comment::class.java)?.copy(id = doc.id)
+            }
+            Resource.Success(comments)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Yorumlar alınamadı.")
+        }
+    }
 }

@@ -163,6 +163,11 @@ service cloud.firestore {
                          (isOwner(resource.data.authorId) || isAdmin());
       }
     }
+    // ========== COLLECTION GROUP QUERIES ==========
+    // Kullanıcının tüm yorumlarını (hangi post'ta olursa olsun) çekebilmesi için gerekli
+    match /{path=**}/comments/{commentId} {
+      allow read: if isAuthenticated();
+    }
   }
 }
 

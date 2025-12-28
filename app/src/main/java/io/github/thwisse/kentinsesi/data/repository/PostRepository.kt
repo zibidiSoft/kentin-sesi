@@ -48,4 +48,7 @@ interface PostRepository {
     
     // Post ID'ye göre tek bir post getir (State restore için)
     suspend fun getPostById(postId: String): Resource<io.github.thwisse.kentinsesi.data.model.Post>
+    
+    // Kullanıcının tüm yorumlarını getir (Profile için)
+    suspend fun getUserComments(userId: String): Resource<List<io.github.thwisse.kentinsesi.data.model.Comment>>
 }

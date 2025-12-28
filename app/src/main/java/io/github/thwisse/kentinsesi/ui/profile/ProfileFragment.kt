@@ -10,6 +10,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -19,7 +21,7 @@ import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.thwisse.kentinsesi.R
 import io.github.thwisse.kentinsesi.databinding.FragmentProfileBinding
-import io.github.thwisse.kentinsesi.ui.AuthActivity // <-- 1. EKSİK IMPORT EKLENDİ
+import io.github.thwisse.kentinsesi.ui.AuthActivity
 import io.github.thwisse.kentinsesi.ui.home.PostAdapter
 import io.github.thwisse.kentinsesi.util.Resource
 
@@ -31,17 +33,19 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private val viewModel: ProfileViewModel by viewModels()
     private lateinit var postAdapter: PostAdapter
+    private lateinit var commentAdapter: UserCommentAdapter
 
     private var isAdminUser: Boolean = false
+    private var isPostsTabSelected: Boolean = true
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentProfileBinding.bind(view)
 
         setupMenu()
-
         setupUserInfo()
-        setupRecyclerView()
+        setupRecyclerViews()
+        setupTabs()
         setupSwipeRefresh()
         setupObservers()
     }
@@ -178,15 +182,96 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         }
     }
 
-    private fun setupRecyclerView() {
+    private fun setupRecyclerViews() {
+        // Posts adapter
         postAdapter = PostAdapter(
             onItemClick = { post ->
-                // Karta tıklayınca Detay'a git (sadece post ID gönder)
                 val bundle = Bundle().apply { putString("postId", post.id) }
                 findNavController().navigate(R.id.action_nav_profile_to_postDetailFragment, bundle)
             }
         )
         binding.rvUserPosts.adapter = postAdapter
+
+        // Comments adapter
+        commentAdapter = UserCommentAdapter(
+            onItemClick = { comment ->
+                // Yorumun ait olduğu post'a git
+                // Comment'in parent document path'inden postId'yi çıkaramıyoruz,
+                // bu yüzden şimdilik sadece Toast gösterelim
+                // İleride Comment modeline postId eklenebilir
+                Toast.makeText(
+                    requireContext(),
+                    "Yorum detayı: ${comment.text.take(50)}...",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        )
+        binding.rvUserComments.adapter = commentAdapter
+    }
+
+    private fun setupTabs() {
+        binding.tvTabPosts.setOnClickListener {
+            selectPostsTab()
+        }
+
+        binding.tvTabComments.setOnClickListener {
+            selectCommentsTab()
+        }
+    }
+
+    private fun selectPostsTab() {
+        if (isPostsTabSelected) return
+        isPostsTabSelected = true
+
+        // Tab text styles
+        binding.tvTabPosts.setTextColor(requireContext().getColor(R.color.md_theme_primary))
+        binding.tvTabPosts.setTypeface(null, android.graphics.Typeface.BOLD)
+        binding.tvTabComments.setTextColor(requireContext().getColor(android.R.color.darker_gray))
+        binding.tvTabComments.setTypeface(null, android.graphics.Typeface.NORMAL)
+
+        // Indicator position
+        updateTabIndicator(binding.tvTabPosts)
+
+        // Show/hide RecyclerViews
+        binding.rvUserPosts.visibility = View.VISIBLE
+        binding.rvUserComments.visibility = View.GONE
+    }
+
+    private fun selectCommentsTab() {
+        if (!isPostsTabSelected) return
+        isPostsTabSelected = false
+
+        // Tab text styles
+        binding.tvTabComments.setTextColor(requireContext().getColor(R.color.md_theme_primary))
+        binding.tvTabComments.setTypeface(null, android.graphics.Typeface.BOLD)
+        binding.tvTabPosts.setTextColor(requireContext().getColor(android.R.color.darker_gray))
+        binding.tvTabPosts.setTypeface(null, android.graphics.Typeface.NORMAL)
+
+        // Indicator position
+        updateTabIndicator(binding.tvTabComments)
+
+        // Show/hide RecyclerViews
+        binding.rvUserPosts.visibility = View.GONE
+        binding.rvUserComments.visibility = View.VISIBLE
+    }
+
+    private fun updateTabIndicator(targetTab: View) {
+        val constraintLayout = binding.root as ConstraintLayout
+        val constraintSet = ConstraintSet()
+        constraintSet.clone(constraintLayout)
+        constraintSet.connect(
+            binding.tabIndicator.id,
+            ConstraintSet.START,
+            targetTab.id,
+            ConstraintSet.START
+        )
+        constraintSet.connect(
+            binding.tabIndicator.id,
+            ConstraintSet.END,
+            targetTab.id,
+            ConstraintSet.END
+        )
+        constraintSet.applyTo(constraintLayout)
     }
 
     private fun setupSwipeRefresh() {
@@ -196,33 +281,61 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     }
     
     private fun setupObservers() {
-        // UserPosts observer - SwipeRefresh'i kontrol et
+        // UserPosts observer
         viewModel.userPosts.observe(viewLifecycleOwner) { resource ->
-            // Loading durumunu SwipeRefresh'e bildir
-            binding.swipeRefreshLayout.isRefreshing = resource is Resource.Loading
+            if (isPostsTabSelected) {
+                binding.swipeRefreshLayout.isRefreshing = resource is Resource.Loading
+            }
             
             when(resource) {
                 is Resource.Success -> {
                     postAdapter.submitList(resource.data)
-                    // Başarılı olunca refresh'i durdur
-                    binding.swipeRefreshLayout.isRefreshing = false
+                    if (isPostsTabSelected) {
+                        binding.swipeRefreshLayout.isRefreshing = false
+                    }
                 }
                 is Resource.Error -> {
                     Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
-                    // Hata olsa bile refresh'i durdur
-                    binding.swipeRefreshLayout.isRefreshing = false
+                    if (isPostsTabSelected) {
+                        binding.swipeRefreshLayout.isRefreshing = false
+                    }
+                }
+                is Resource.Loading -> { }
+            }
+        }
+
+        // UserComments observer
+        viewModel.userComments.observe(viewLifecycleOwner) { resource ->
+            if (!isPostsTabSelected) {
+                binding.swipeRefreshLayout.isRefreshing = resource is Resource.Loading
+            }
+
+            when(resource) {
+                is Resource.Success -> {
+                    commentAdapter.submitList(resource.data)
+                    if (!isPostsTabSelected) {
+                        binding.swipeRefreshLayout.isRefreshing = false
+                    }
+                }
+                is Resource.Error -> {
+                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
+                    if (!isPostsTabSelected) {
+                        binding.swipeRefreshLayout.isRefreshing = false
+                    }
                 }
                 is Resource.Loading -> { }
             }
         }
         
-        // UserProfile observer - Hem profil hem postlar yüklenene kadar refresh göster
+        // UserProfile observer
         viewModel.userProfile.observe(viewLifecycleOwner) { resource ->
-            // Profil yüklenirken de refresh göster (userPosts loading değilse)
-            if (resource is Resource.Loading && viewModel.userPosts.value !is Resource.Loading) {
+            if (resource is Resource.Loading && 
+                viewModel.userPosts.value !is Resource.Loading &&
+                viewModel.userComments.value !is Resource.Loading) {
                 binding.swipeRefreshLayout.isRefreshing = true
-            } else if (resource !is Resource.Loading && viewModel.userPosts.value !is Resource.Loading) {
-                // Her ikisi de yüklendiğinde refresh'i durdur
+            } else if (resource !is Resource.Loading && 
+                       viewModel.userPosts.value !is Resource.Loading &&
+                       viewModel.userComments.value !is Resource.Loading) {
                 binding.swipeRefreshLayout.isRefreshing = false
             }
         }

@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.thwisse.kentinsesi.data.model.Comment
 import io.github.thwisse.kentinsesi.data.model.Post
 import io.github.thwisse.kentinsesi.data.model.PostStatus
 import io.github.thwisse.kentinsesi.data.repository.AuthRepository
@@ -23,6 +24,10 @@ class ProfileViewModel @Inject constructor(
     private val _userPosts = MutableLiveData<Resource<List<Post>>>()
     val userPosts: LiveData<Resource<List<Post>>> = _userPosts
 
+    // Kullanıcının yorumları
+    private val _userComments = MutableLiveData<Resource<List<Comment>>>()
+    val userComments: LiveData<Resource<List<Comment>>> = _userComments
+
     // İstatistikler için LiveData
     private val _totalPostsCount = MutableLiveData<Int>()
     val totalPostsCount: LiveData<Int> = _totalPostsCount
@@ -40,6 +45,7 @@ class ProfileViewModel @Inject constructor(
     init {
         loadUserProfile()
         loadUserPosts()
+        loadUserComments()
     }
     
     /**
@@ -73,13 +79,27 @@ class ProfileViewModel @Inject constructor(
             _userPosts.value = result
         }
     }
+
+    /**
+     * Kullanıcının yaptığı tüm yorumları yükle
+     */
+    fun loadUserComments() {
+        val userId = currentUser?.uid ?: return
+
+        viewModelScope.launch {
+            _userComments.value = Resource.Loading()
+            val result = postRepository.getUserComments(userId)
+            _userComments.value = result
+        }
+    }
     
     /**
-     * Pull-to-refresh için: Hem profil hem postları yenile
+     * Pull-to-refresh için: Hem profil hem postları hem yorumları yenile
      */
     fun refreshAll() {
         loadUserProfile()
         loadUserPosts()
+        loadUserComments()
     }
 
     fun signOut() {

@@ -70,4 +70,8 @@
     <string name="post_detail_support">Support</string>
     <string name="post_detail_description">Description</string>
     <string name="comments_header_initial">Comments (0)</string>
+
+    <!-- Profile tabs -->
+    <string name="my_posts">Paylaşımlarım</string>
+    <string name="my_comments">Yorumlarım</string>
 </resources>

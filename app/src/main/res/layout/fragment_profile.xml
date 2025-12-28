@@ -128,18 +128,54 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <TextView
-        android:id="@+id/tvMyPostsTitle"
-        android:layout_width="wrap_content"
+    <!-- Tab Bar: Paylaşımlarım | Yorumlarım -->
+    <LinearLayout
+        android:id="@+id/tabContainer"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="24dp"
-        android:text="Paylaşımlarım"
-        android:textStyle="bold"
-        android:textColor="?android:attr/textColorPrimary"
-        android:textSize="18sp"
+        android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cvStats" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cvStats">
+
+        <TextView
+            android:id="@+id/tvTabPosts"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:paddingVertical="12dp"
+            android:text="@string/my_posts"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorPrimary"
+            android:background="?attr/selectableItemBackground" />
+
+        <TextView
+            android:id="@+id/tvTabComments"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:paddingVertical="12dp"
+            android:text="@string/my_comments"
+            android:textSize="16sp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:background="?attr/selectableItemBackground" />
+
+    </LinearLayout>
+
+    <!-- Tab indicator line -->
+    <View
+        android:id="@+id/tabIndicator"
+        android:layout_width="0dp"
+        android:layout_height="3dp"
+        android:background="?attr/colorPrimary"
+        app:layout_constraintStart_toStartOf="@id/tvTabPosts"
+        app:layout_constraintEnd_toEndOf="@id/tvTabPosts"
+        app:layout_constraintTop_toBottomOf="@id/tabContainer" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
@@ -147,13 +183,28 @@
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvMyPostsTitle">
+        app:layout_constraintTop_toBottomOf="@id/tabIndicator">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvUserPosts"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            android:layout_height="match_parent">
+
+            <!-- Posts RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvUserPosts"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+            <!-- Comments RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvUserComments"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        </FrameLayout>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
