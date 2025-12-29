@@ -25,7 +25,7 @@
     <string name="just_now">Az önce</string>
     <string name="reply_write_hint">Yanıt yaz…</string>
     <string name="comment_write_hint">Bir yorum yaz…</string>
-    <string name="comments_header">Yorumlar (%1$d yorum)</string>
+    <string name="comments_header">Yorumlar (%1$d)</string>
 
     <string name="cd_post_image">Paylaşım görseli</string>
     <string name="cd_selected_photo">Seçilen fotoğraf</string>
@@ -69,5 +69,5 @@
 
     <string name="post_detail_support">Destekle</string>
     <string name="post_detail_description">Açıklama</string>
-    <string name="comments_header_initial">Yorumlar (0 yorum)</string>
+    <string name="comments_header_initial">Yorumlar (0)</string>
 </resources>

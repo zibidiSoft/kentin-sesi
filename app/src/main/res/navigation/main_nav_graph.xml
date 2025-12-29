@@ -76,6 +76,19 @@
         <argument
             android:name="postId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_postDetailFragment_to_statusUpdatesFragment"
+            app:destination="@id/statusUpdatesFragment" />
+    </fragment>
+    
+    <fragment
+        android:id="@+id/statusUpdatesFragment"
+        android:name="io.github.thwisse.kentinsesi.ui.post.StatusUpdatesFragment"
+        android:label="Güncellemeler"
+        tools:layout="@layout/fragment_status_updates">
+        <argument
+            android:name="postId"
+            app:argType="string" />
     </fragment>
     <dialog
         android:id="@+id/filterBottomSheetFragment"

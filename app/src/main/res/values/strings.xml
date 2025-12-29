@@ -79,4 +79,20 @@
     <string name="comment_deleted_by_admin">Bu yorum yönetici tarafından silindi.</string>
     <string name="dialog_delete_comment_title">Yorumu Sil</string>
     <string name="dialog_delete_comment_message">Bu yorumun içeriği silinecek. Emin misiniz?</string>
+    
+    <!-- Status Updates -->
+    <string name="status_updates">Güncellemeler</string>
+    <string name="status_updates_count">Güncellemeler (%d)</string>
+    <string name="status_update_dialog_title">Durumu Güncelle</string>
+    <string name="status_update_note_hint">Not ekleyin (zorunlu)</string>
+    <string name="status_update_note_empty">Not alanı boş bırakılamaz</string>
+    <string name="status_update_success">Durum güncellendi</string>
+    <string name="status_update_error">Güncelleme başarısız</string>
+    <string name="no_status_updates">Henüz güncelleme yok</string>
+    <string name="initial_status_note">Paylaşım yapıldı</string>
+    
+    <!-- Status badges -->
+    <string name="status_new_badge">YENİ</string>
+    <string name="status_in_progress_badge">İŞLEMDE</string>
+    <string name="status_resolved_badge">ÇÖZÜLDÜ</string>
 </resources>

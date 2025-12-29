@@ -164,6 +164,31 @@ service cloud.firestore {
         allow delete: if isAuthenticated() && 
                          (isOwner(resource.data.authorId) || isAdmin());
       }
+      
+      // ========== STATUS UPDATES SUBCOLLECTION ==========
+      match /statusUpdates/{updateId} {
+        // Okuma: Herkes okuyabilir
+        allow read: if isAuthenticated();
+        
+        // Oluşturma: Post sahibi veya yetkili
+        allow create: if isAuthenticated() && (
+                         // Post sahibi
+                         get(/databases/$(database)/documents/posts/$(postId)).data.authorId == request.auth.uid ||
+                         // Yetkili veya admin
+                         isOfficial()
+                       ) && 
+                       // Alan kontrolü
+                       request.resource.data.keys().hasOnly([
+                         'postId', 'status', 'note', 'authorId',
+                         'authorFullName', 'authorUsername', 'createdAt'
+                       ]) &&
+                       request.resource.data.note is string &&
+                       request.resource.data.note.size() > 0 &&
+                       request.resource.data.note.size() <= 500;
+        
+        // Güncelleme ve silme yasak
+        allow update, delete: if false;
+      }
     }
     // ========== COLLECTION GROUP QUERIES ==========
     // Kullanıcının tüm yorumlarını (hangi post'ta olursa olsun) çekebilmesi için gerekli
@@ -172,4 +197,3 @@ service cloud.firestore {
     }
   }
 }
-

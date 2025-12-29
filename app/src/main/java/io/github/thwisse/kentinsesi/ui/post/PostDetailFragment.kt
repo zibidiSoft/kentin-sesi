@@ -130,6 +130,7 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
         observePostLoadState()
         observeToggleUpvoteState()
         observeOwnerActions()
+        setupStatusUpdates()
 
         viewModel.postAuthor.observe(viewLifecycleOwner) { author ->
             if (author == null) {
@@ -358,64 +359,55 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
     /**
      * Post durumunu güncellemek için dialog göster
      */
+    private fun setupStatusUpdates() {
+        // Status count observer
+        viewModel.statusUpdateCount.observe(viewLifecycleOwner) { count ->
+            binding.tvStatusUpdates.text = getString(R.string.status_updates_count, count)
+        }
+        
+        // Timeline'ı yükle
+        currentPostId?.let { postId ->
+            viewModel.loadStatusUpdates(postId)
+        }
+        
+        // Güncellemeler butonuna tıklama
+        binding.cardStatusUpdates.setOnClickListener {
+            currentPostId?.let { postId ->
+                val bundle = Bundle().apply {
+                    putString("postId", postId)
+                }
+                findNavController().navigate(
+                    R.id.action_postDetailFragment_to_statusUpdatesFragment,
+                    bundle
+                )
+            }
+        }
+        
+        // Status update sonucu observer
+        viewModel.addStatusUpdateState.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    Toast.makeText(requireContext(), R.string.status_update_success, Toast.LENGTH_SHORT).show()
+                    // Post detail'i yenile (status değişti)
+                    currentPostId?.let { viewModel.loadPostById(it) }
+                }
+                is Resource.Error -> {
+                    Toast.makeText(requireContext(), resource.message ?: getString(R.string.status_update_error), Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Loading -> { }
+            }
+        }
+    }
+    
+    
     private fun showUpdateStatusDialog() {
-        val dialogView = layoutInflater.inflate(io.github.thwisse.kentinsesi.R.layout.dialog_update_post_status, null)
-        val dialog = android.app.AlertDialog.Builder(requireContext())
-            .setView(dialogView)
-            .create()
+        val currentPostStatus = currentPost?.statusEnum ?: viewModel.currentPost.value?.statusEnum ?: PostStatus.NEW
         
-        val rgStatus = dialogView.findViewById<android.widget.RadioGroup>(io.github.thwisse.kentinsesi.R.id.rgStatus)
-        val btnCancel = dialogView.findViewById<android.widget.Button>(io.github.thwisse.kentinsesi.R.id.btnCancel)
-        val btnUpdate = dialogView.findViewById<android.widget.Button>(io.github.thwisse.kentinsesi.R.id.btnUpdate)
-        
-        // Mevcut durumu seçili yap
-        val currentPost = currentPost ?: viewModel.currentPost.value
-        currentPost?.let { post ->
-            when (post.statusEnum) {
-                io.github.thwisse.kentinsesi.data.model.PostStatus.NEW -> {
-                    rgStatus.check(io.github.thwisse.kentinsesi.R.id.rbNew)
-                }
-                io.github.thwisse.kentinsesi.data.model.PostStatus.IN_PROGRESS -> {
-                    rgStatus.check(io.github.thwisse.kentinsesi.R.id.rbInProgress)
-                }
-                io.github.thwisse.kentinsesi.data.model.PostStatus.RESOLVED -> {
-                    rgStatus.check(io.github.thwisse.kentinsesi.R.id.rbResolved)
-                }
-                else -> {
-                    rgStatus.check(io.github.thwisse.kentinsesi.R.id.rbNew)
-                }
-            }
+        val bottomSheet = UpdateStatusBottomSheet.newInstance(currentPostStatus)
+        bottomSheet.setOnStatusUpdateListener { status, note ->
+            viewModel.addStatusUpdate(status, note)
         }
-        
-        btnCancel.setOnClickListener {
-            dialog.dismiss()
-        }
-        
-        btnUpdate.setOnClickListener {
-            val selectedStatus = when (rgStatus.checkedRadioButtonId) {
-                io.github.thwisse.kentinsesi.R.id.rbNew -> io.github.thwisse.kentinsesi.data.model.PostStatus.NEW
-                io.github.thwisse.kentinsesi.R.id.rbInProgress -> io.github.thwisse.kentinsesi.data.model.PostStatus.IN_PROGRESS
-                io.github.thwisse.kentinsesi.R.id.rbResolved -> io.github.thwisse.kentinsesi.data.model.PostStatus.RESOLVED
-                else -> null
-            }
-
-            if (selectedStatus == null) {
-                Toast.makeText(requireContext(), "Lütfen bir durum seçin", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val postId = currentPostId
-            if (postId == null) {
-                Toast.makeText(requireContext(), "Post ID bulunamadı", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            lastRequestedStatus = selectedStatus
-            viewModel.updatePostStatus(postId, selectedStatus)
-            dialog.dismiss()
-        }
-
-        dialog.show()
+        bottomSheet.show(childFragmentManager, "UpdateStatusBottomSheet")
     }
 
     private fun observeOwnerActions() {

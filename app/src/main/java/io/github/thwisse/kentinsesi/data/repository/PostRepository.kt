@@ -49,6 +49,10 @@ interface PostRepository {
 
     suspend fun getUserPosts(userId: String): Resource<List<io.github.thwisse.kentinsesi.data.model.Post>>
     
+    // Status Updates (Timeline)
+    suspend fun getStatusUpdates(postId: String): Resource<List<io.github.thwisse.kentinsesi.data.model.StatusUpdate>>
+    suspend fun addStatusUpdate(postId: String, status: io.github.thwisse.kentinsesi.data.model.PostStatus, note: String): Resource<Unit>
+    
     // Post ID'ye göre tek bir post getir (State restore için)
     suspend fun getPostById(postId: String): Resource<io.github.thwisse.kentinsesi.data.model.Post>
     

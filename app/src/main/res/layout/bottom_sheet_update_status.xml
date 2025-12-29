@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Başlık -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/status_update_dialog_title"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="?android:textColorPrimary" />
+
+    <!-- Durum Seçimi -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Durum"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="?android:textColorPrimary" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/radioNew"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_new_badge"
+            android:textSize="16sp"
+            android:paddingVertical="8dp" />
+
+        <RadioButton
+            android:id="@+id/radioInProgress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_in_progress_badge"
+            android:textSize="16sp"
+            android:paddingVertical="8dp" />
+
+        <RadioButton
+            android:id="@+id/radioResolved"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_resolved_badge"
+            android:textSize="16sp"
+            android:paddingVertical="8dp" />
+
+    </RadioGroup>
+
+    <!-- Not Girişi -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Not (Zorunlu)"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="?android:textColorPrimary" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayoutNote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="@string/status_update_note_hint"
+        app:counterEnabled="true"
+        app:counterMaxLength="500"
+        app:endIconMode="clear_text">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine|textCapSentences"
+            android:minLines="3"
+            android:maxLines="6"
+            android:maxLength="500"
+            android:gravity="top|start" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Butonlar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="İptal"
+            style="@style/Widget.Material3.Button.TextButton" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Kaydet"
+            android:enabled="false" />
+
+    </LinearLayout>
+
+</LinearLayout>

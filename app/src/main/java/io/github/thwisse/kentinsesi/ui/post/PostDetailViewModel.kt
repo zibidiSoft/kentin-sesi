@@ -40,6 +40,16 @@ class PostDetailViewModel @Inject constructor(
     private val _updateStatusState = MutableLiveData<Resource<Unit>>()
     val updateStatusState: LiveData<Resource<Unit>> = _updateStatusState
     
+    // Status Updates (Timeline)
+    private val _statusUpdates = MutableLiveData<Resource<List<io.github.thwisse.kentinsesi.data.model.StatusUpdate>>>()
+    val statusUpdates: LiveData<Resource<List<io.github.thwisse.kentinsesi.data.model.StatusUpdate>>> = _statusUpdates
+    
+    private val _statusUpdateCount = MutableLiveData<Int>(0)
+    val statusUpdateCount: LiveData<Int> = _statusUpdateCount
+    
+    private val _addStatusUpdateState = MutableLiveData<Resource<Unit>>()
+    val addStatusUpdateState: LiveData<Resource<Unit>> = _addStatusUpdateState
+    
     // Post bilgisi ve kullanıcı bilgisi
     private val _currentPost = MutableLiveData<Post?>()
     val currentPost: LiveData<Post?> = _currentPost
@@ -256,6 +266,38 @@ class PostDetailViewModel @Inject constructor(
             }
         }
     }
+    
+    // ======================== STATUS UPDATES ========================
+    
+    fun loadStatusUpdates(postId: String) {
+        viewModelScope.launch {
+            _statusUpdates.value = Resource.Loading()
+            val result = postRepository.getStatusUpdates(postId)
+            _statusUpdates.value = result
+            
+            // Count güncelle
+            if (result is Resource.Success) {
+                _statusUpdateCount.value = result.data?.size ?: 0
+            }
+        }
+    }
+    
+    fun addStatusUpdate(status: PostStatus, note: String) {
+        val postId = _currentPost.value?.id ?: return
+        
+        viewModelScope.launch {
+            _addStatusUpdateState.value = Resource.Loading()
+            val result = postRepository.addStatusUpdate(postId, status, note)
+            _addStatusUpdateState.value = result
+            
+            if (result is Resource.Success) {
+                // Timeline ve count'u yenile
+                loadStatusUpdates(postId)
+            }
+        }
+    }
+    
+    // ======================== COMMENTS ========================
     
     fun deleteComment(commentId: String) {
         val postId = _currentPost.value?.id

@@ -60,8 +60,30 @@ class PostRepositoryImpl @Inject constructor(
                 commentCount = 0
             )
 
-            // Constants kullanarak collection adını merkezileştirdik
+            // Post oluştur
             val docRef = firestore.collection(Constants.COLLECTION_POSTS).add(newPost).await()
+            val postId = docRef.id
+            
+            // Kullanıcı bilgilerini çek (ilk status update için)
+            val userDoc = firestore.collection(Constants.COLLECTION_USERS)
+                .document(currentUser.uid)
+                .get()
+                .await()
+            val profile = userDoc.toObject(User::class.java)
+            
+            // Otomatik ilk status update ekle
+            val initialUpdate = hashMapOf(
+                "postId" to postId,
+                "status" to "new",
+                "note" to "Paylaşım yapıldı",
+                "authorId" to currentUser.uid,
+                "authorFullName" to (profile?.fullName ?: ""),
+                "authorUsername" to (profile?.username ?: ""),
+                "createdAt" to FieldValue.serverTimestamp()
+            )
+            
+            docRef.collection("statusUpdates").add(initialUpdate).await()
+            
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Hata")
@@ -615,6 +637,88 @@ class PostRepositoryImpl @Inject constructor(
             Resource.Success(comments)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Yorumlar alınamadı.")
+        }
+    }
+    
+    // ======================== STATUS UPDATES ========================
+    
+    override suspend fun getStatusUpdates(postId: String): Resource<List<io.github.thwisse.kentinsesi.data.model.StatusUpdate>> {
+        return try {
+            val snapshot = firestore.collection(Constants.COLLECTION_POSTS)
+                .document(postId)
+                .collection("statusUpdates")
+                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .get(com.google.firebase.firestore.Source.SERVER) // Her zaman fresh data
+                .await()
+            
+            val updates = snapshot.documents.mapNotNull { doc ->
+                val data = doc.data ?: return@mapNotNull null
+                
+                io.github.thwisse.kentinsesi.data.model.StatusUpdate(
+                    id = doc.id,
+                    postId = postId,
+                    status = data["status"] as? String ?: "",
+                    note = data["note"] as? String ?: "",
+                    authorId = data["authorId"] as? String ?: "",
+                    authorFullName = data["authorFullName"] as? String ?: "",
+                    authorUsername = data["authorUsername"] as? String ?: "",
+                    createdAt = (data["createdAt"] as? com.google.firebase.Timestamp)?.toDate()
+                )
+            }
+            
+            Resource.Success(updates)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Güncellemeler alınamadı.")
+        }
+    }
+    
+    override suspend fun addStatusUpdate(
+        postId: String, 
+        status: PostStatus, 
+        note: String
+    ): Resource<Unit> {
+        return try {
+            val user = auth.currentUser ?: throw Exception("Oturum açılmamış.")
+            
+            // Kullanıcı bilgilerini çek
+            val userDoc = firestore.collection(Constants.COLLECTION_USERS)
+                .document(user.uid)
+                .get()
+                .await()
+            val profile = userDoc.toObject(User::class.java)
+            
+            val statusValue = when (status) {
+                PostStatus.NEW -> "new"
+                PostStatus.IN_PROGRESS -> "in_progress"
+                PostStatus.RESOLVED -> "resolved"
+                PostStatus.REJECTED -> "rejected"
+            }
+            
+            val updateData = hashMapOf(
+                "postId" to postId,
+                "status" to statusValue,
+                "note" to note,
+                "authorId" to user.uid,
+                "authorFullName" to (profile?.fullName ?: ""),
+                "authorUsername" to (profile?.username ?: ""),
+                "createdAt" to FieldValue.serverTimestamp()
+            )
+            
+            // Transaction: StatusUpdate ekle + Post status güncelle
+            firestore.runTransaction { transaction ->
+                val postRef = firestore.collection(Constants.COLLECTION_POSTS).document(postId)
+                val updateRef = postRef.collection("statusUpdates").document()
+                
+                // StatusUpdate ekle
+                transaction.set(updateRef, updateData)
+                
+                // Post'un status alanını güncelle
+                transaction.update(postRef, "status", statusValue)
+            }.await()
+            
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Durum güncellenemedi.")
         }
     }
 }
