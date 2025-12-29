@@ -30,6 +30,9 @@ interface PostRepository {
     suspend fun getComments(postId: String): Resource<List<io.github.thwisse.kentinsesi.data.model.Comment>>
 
     suspend fun addComment(postId: String, text: String): Resource<Unit>
+    
+    // Yorum sil (Soft delete)
+    suspend fun deleteComment(postId: String, commentId: String, isAdmin: Boolean): Resource<Unit>
 
     suspend fun getThreadedComments(postId: String): Resource<List<io.github.thwisse.kentinsesi.data.model.Comment>>
 

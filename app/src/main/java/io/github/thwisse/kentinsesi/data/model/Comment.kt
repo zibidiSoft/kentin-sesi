@@ -23,7 +23,14 @@ data class Comment(
     val replyToAuthorId: String? = null,
     val replyToAuthorFullName: String? = null,
     val replyToAuthorUsername: String? = null,
+    
+    // Parent Post ID (Needed for navigation and deletion from profile)
+    var postId: String = "",
 
+    // Soft Delete fields - VAR olmalı çünkü Firestore toObject() setter gerektirir
+    var isDeleted: Boolean = false,
+    var deletedBy: String? = null, // "user" or "admin"
+    
     @ServerTimestamp
     val createdAt: Date? = null
 )

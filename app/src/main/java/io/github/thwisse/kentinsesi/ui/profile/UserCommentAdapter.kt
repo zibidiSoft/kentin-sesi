@@ -12,7 +12,8 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class UserCommentAdapter(
-    private val onItemClick: (Comment) -> Unit
+    private val onItemClick: (Comment) -> Unit,
+    private val onItemLongClick: ((Comment) -> Unit)? = null
 ) : ListAdapter<Comment, UserCommentAdapter.UserCommentViewHolder>(CommentDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserCommentViewHolder {
@@ -35,8 +36,33 @@ class UserCommentAdapter(
         fun bind(comment: Comment) {
             val context = binding.root.context
 
-            // Comment text
-            binding.tvCommentText.text = comment.text
+            // Comment text & Soft Delete UI
+            if (comment.isDeleted) {
+                binding.tvCommentText.setTypeface(null, android.graphics.Typeface.ITALIC)
+                binding.tvCommentText.setTextColor(android.graphics.Color.GRAY)
+                
+                binding.tvCommentText.text = if (comment.deletedBy == "admin") {
+                    context.getString(R.string.comment_deleted_by_admin)
+                } else {
+                    context.getString(R.string.comment_deleted_by_user)
+                }
+                
+                // Silinmişse tıklama ve uzun tıklama iptal (isteğe bağlı sadece uzun tıklama iptal)
+                // Detaya gitmek için tıklama kalabilir, ancak silme işlemi yapılmasın.
+                binding.root.setOnLongClickListener(null)
+            } else {
+                binding.tvCommentText.setTypeface(null, android.graphics.Typeface.NORMAL)
+                // Sabit koyu renk kullan
+                binding.tvCommentText.setTextColor(android.graphics.Color.parseColor("#333333"))
+
+                binding.tvCommentText.text = comment.text
+                
+                // Uzun basma -> Silme
+                binding.root.setOnLongClickListener { 
+                    onItemLongClick?.invoke(comment)
+                    true
+                }
+            }
 
             // Date
             val date = comment.createdAt

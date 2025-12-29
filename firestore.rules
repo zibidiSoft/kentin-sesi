@@ -37,7 +37,7 @@ service cloud.firestore {
     }
 
     function commentAllowedKeys() {
-      return ['authorId', 'authorFullName', 'authorUsername', 'authorCity', 'authorDistrict', 'authorTitle', 'text', 'parentCommentId', 'rootCommentId', 'depth', 'replyCount', 'replyToAuthorId', 'replyToAuthorFullName', 'replyToAuthorUsername', 'createdAt'];
+      return ['authorId', 'authorFullName', 'authorUsername', 'authorCity', 'authorDistrict', 'authorTitle', 'text', 'parentCommentId', 'rootCommentId', 'depth', 'replyCount', 'replyToAuthorId', 'replyToAuthorFullName', 'replyToAuthorUsername', 'createdAt', 'isDeleted', 'deletedBy', 'postId'];
     }
 
     function hasOnlyCommentAllowedKeys(data) {
@@ -144,10 +144,12 @@ service cloud.firestore {
                          request.resource.data.authorTitle is string &&
                          request.resource.data.text is string;
         
-        // Güncelleme: Sadece yorum sahibi güncelleyebilir
+        // Güncelleme: Yorum sahibi veya admin güncelleyebilir
         allow update: if isAuthenticated() && (
                          // Yorum sahibi kendi yorumunu güncelleyebilir
                          isOwner(resource.data.authorId) ||
+                         // Admin herhangi bir yorumu güncelleyebilir (soft delete için)
+                         isAdmin() ||
                          // Reply atılınca root yorumun replyCount alanı +1 güncellenebilsin
                          (
                            // Eski yorumlarda depth alanı olmayabilir => top-level kabul et

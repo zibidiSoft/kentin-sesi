@@ -43,6 +43,12 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
         },
         onRepliesToggleClick = { rootComment ->
             toggleReplies(rootComment)
+        },
+        onCommentLongClick = { comment ->
+            if (comment.isDeleted) return@CommentAdapter
+            // Basit yetki kontrolü: Sadece kendi yorumunu veya yetkili ise silebilir
+            // Detaylı kontrolü ViewModel/Repository yapacak
+            showDeleteCommentDialog(comment)
         }
     )
 
@@ -147,6 +153,43 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
                 }.ifBlank { " " }
             }
         }
+
+        viewModel.addReplyState.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Error -> {
+                    binding.etComment.error = resource.message
+                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Success -> {
+                    exitReplyMode()
+                    hideKeyboardAndClearInputFocus()
+                }
+                is Resource.Loading -> { }
+            }
+        }
+        
+        viewModel.deleteCommentState.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    Toast.makeText(requireContext(), "Yorum silindi", Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Error -> {
+                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Loading -> { }
+            }
+        }
+    }
+
+    private fun showDeleteCommentDialog(comment: Comment) {
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle(R.string.dialog_delete_comment_title)
+            .setMessage(R.string.dialog_delete_comment_message)
+            .setPositiveButton("Sil") { _, _ ->
+                viewModel.deleteComment(comment.id)
+            }
+            .setNegativeButton("İptal", null)
+            .show()
     }
 
     private fun enterReplyMode(comment: Comment) {
@@ -463,9 +506,6 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
         binding.btnDetailUpvote.text = if (isUpvotedByMe) "Desteği Geri Çek" else "Destekle"
     }
 
-    // ... setupMap, setupComments, onMapReady ve onDestroyView AYNI KALIYOR ...
-    // Sadece yer kaplamasın diye tekrar yazmıyorum, o kısımlarda değişiklik yok.
-
     private fun setupMap(post: Post) {
         if (post.location != null) {
             postLocation = LatLng(post.location.latitude, post.location.longitude)
@@ -545,14 +585,18 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
                     val all = resource.data ?: emptyList()
                     allThreadedComments = all
 
-                    binding.tvCommentsHeader.text = "Yorumlar (${all.size} yorum)"
+                    // Sadece silinmemiş yorumları say
+                    val activeCommentCount = all.count { !it.isDeleted }
+                    binding.tvCommentsHeader.text = "Yorumlar ($activeCommentCount yorum)"
 
                     val childCounts = buildChildCountByParentId(all)
                     commentAdapter.setChildCountByParentId(childCounts)
                     commentAdapter.setExpandedCommentIds(expandedCommentIds)
 
                     val visible = buildVisibleComments(all, expandedCommentIds)
-                    commentAdapter.submitList(visible)
+                    // Force refresh - yeni liste göndermeden önce null gönder
+                    commentAdapter.submitList(null)
+                    commentAdapter.submitList(visible.toList())
                     if (isRefreshingComments) {
                         isRefreshingComments = false
                         if (!isRefreshingPost) {
@@ -581,20 +625,6 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
                 }
                 is Resource.Success -> {
                     // Yorum başarıyla eklendi, yorumlar otomatik yenilenecek
-                    hideKeyboardAndClearInputFocus()
-                }
-                is Resource.Loading -> { }
-            }
-        }
-
-        viewModel.addReplyState.observe(viewLifecycleOwner) { resource ->
-            when (resource) {
-                is Resource.Error -> {
-                    binding.etComment.error = resource.message
-                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
-                }
-                is Resource.Success -> {
-                    exitReplyMode()
                     hideKeyboardAndClearInputFocus()
                 }
                 is Resource.Loading -> { }
@@ -684,8 +714,6 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
                     PostStatus.RESOLVED -> "Çözüldü"
                     PostStatus.REJECTED -> "Reddedildi"
                 }
-                // Eğer layout'ta status gösterilecek bir TextView varsa:
-                // binding.tvStatus.text = statusText
             }
         }
     }

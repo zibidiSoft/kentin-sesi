@@ -20,6 +20,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.thwisse.kentinsesi.R
+import io.github.thwisse.kentinsesi.data.model.Comment
 import io.github.thwisse.kentinsesi.databinding.FragmentProfileBinding
 import io.github.thwisse.kentinsesi.ui.AuthActivity
 import io.github.thwisse.kentinsesi.ui.home.PostAdapter
@@ -42,12 +43,29 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentProfileBinding.bind(view)
 
+        // Tab state'i restore et
+        savedInstanceState?.let {
+            isPostsTabSelected = it.getBoolean("isPostsTabSelected", true)
+        }
+
         setupMenu()
         setupUserInfo()
         setupRecyclerViews()
         setupTabs()
         setupSwipeRefresh()
         setupObservers()
+        
+        // Başlangıçta doğru tab'ı göster
+        if (isPostsTabSelected) {
+            showPostsTab()
+        } else {
+            showCommentsTab()
+        }
+    }
+    
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("isPostsTabSelected", isPostsTabSelected)
     }
 
     private fun setupMenu() {
@@ -193,20 +211,35 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         binding.rvUserPosts.adapter = postAdapter
 
         // Comments adapter
+        // Comments adapter
         commentAdapter = UserCommentAdapter(
             onItemClick = { comment ->
                 // Yorumun ait olduğu post'a git
-                // Comment'in parent document path'inden postId'yi çıkaramıyoruz,
-                // bu yüzden şimdilik sadece Toast gösterelim
-                // İleride Comment modeline postId eklenebilir
-                Toast.makeText(
-                    requireContext(),
-                    "Yorum detayı: ${comment.text.take(50)}...",
-                    Toast.LENGTH_SHORT
-                ).show()
+                val bundle = Bundle().apply { putString("postId", comment.postId) }
+                // PostId boş olabilir (eski yorumlar için)
+                if (comment.postId.isNotBlank()) {
+                     findNavController().navigate(R.id.action_nav_profile_to_postDetailFragment, bundle)
+                } else {
+                    Toast.makeText(requireContext(), "Post detayına gidilemiyor", Toast.LENGTH_SHORT).show()
+                }
+            },
+            onItemLongClick = { comment ->
+                if (comment.isDeleted) return@UserCommentAdapter
+                showDeleteCommentDialog(comment)
             }
         )
         binding.rvUserComments.adapter = commentAdapter
+    }
+
+    private fun showDeleteCommentDialog(comment: Comment) {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.dialog_delete_comment_title)
+            .setMessage(R.string.dialog_delete_comment_message)
+            .setPositiveButton("Sil") { _, _ ->
+                viewModel.deleteComment(comment)
+            }
+            .setNegativeButton("İptal", null)
+            .show()
     }
 
     private fun setupTabs() {
@@ -222,7 +255,17 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private fun selectPostsTab() {
         if (isPostsTabSelected) return
         isPostsTabSelected = true
+        showPostsTab()
+    }
 
+    private fun selectCommentsTab() {
+        if (!isPostsTabSelected) return
+        isPostsTabSelected = false
+        showCommentsTab()
+    }
+    
+    // UI güncelleme - state restore için kullanılır
+    private fun showPostsTab() {
         // Tab text styles
         binding.tvTabPosts.setTextColor(requireContext().getColor(R.color.md_theme_primary))
         binding.tvTabPosts.setTypeface(null, android.graphics.Typeface.BOLD)
@@ -237,10 +280,8 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         binding.rvUserComments.visibility = View.GONE
     }
 
-    private fun selectCommentsTab() {
-        if (!isPostsTabSelected) return
-        isPostsTabSelected = false
-
+    // UI güncelleme - state restore için kullanılır
+    private fun showCommentsTab() {
         // Tab text styles
         binding.tvTabComments.setTextColor(requireContext().getColor(R.color.md_theme_primary))
         binding.tvTabComments.setTypeface(null, android.graphics.Typeface.BOLD)

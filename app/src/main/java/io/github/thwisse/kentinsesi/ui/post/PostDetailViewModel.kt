@@ -222,6 +222,9 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
+    private val _deleteCommentState = MutableLiveData<Resource<Unit>>()
+    val deleteCommentState: LiveData<Resource<Unit>> = _deleteCommentState
+
     /**
      * Post durumunu güncelle - Yetkili kullanıcılar veya post sahibi yapabilir
      * @param postId Güncellenecek post'un ID'si
@@ -250,6 +253,43 @@ class PostDetailViewModel @Inject constructor(
                 _currentPost.value?.let { currentPost ->
                     _currentPost.value = currentPost.copy(status = status.value)
                 }
+            }
+        }
+    }
+    
+    fun deleteComment(commentId: String) {
+        val postId = _currentPost.value?.id
+        val user = _currentUser.value
+        
+        android.util.Log.d("DeleteComment", "deleteComment called - postId: $postId, commentId: $commentId, user: $user")
+        
+        if (postId == null) {
+            android.util.Log.e("DeleteComment", "postId is null, returning early")
+            return
+        }
+        if (user == null) {
+            android.util.Log.e("DeleteComment", "user is null, returning early")
+            return
+        }
+        
+        viewModelScope.launch {
+            _deleteCommentState.value = Resource.Loading()
+            
+            // Sadece admin rolü için isAdmin true olmalı, official değil
+            val isAdmin = user.role == "admin"
+            android.util.Log.d("DeleteComment", "Calling repository.deleteComment - isAdmin: $isAdmin")
+            
+            val result = postRepository.deleteComment(postId, commentId, isAdmin)
+            
+            android.util.Log.d("DeleteComment", "Result: $result, is Success: ${result is Resource.Success}")
+            _deleteCommentState.value = result
+            
+            if (result is Resource.Success) {
+                android.util.Log.d("DeleteComment", "SUCCESS! Now calling getComments with postId: $postId")
+                getComments(postId) // Listeyi yenile
+                android.util.Log.d("DeleteComment", "getComments called")
+            } else {
+                android.util.Log.e("DeleteComment", "Result is not Success: $result")
             }
         }
     }

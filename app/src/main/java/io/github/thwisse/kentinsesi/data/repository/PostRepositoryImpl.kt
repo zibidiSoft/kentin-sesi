@@ -224,31 +224,77 @@ class PostRepositoryImpl @Inject constructor(
 
     override suspend fun getComments(postId: String): Resource<List<Comment>> {
         return try {
+            android.util.Log.d("GetComments", "Fetching comments for postId: $postId")
+            
             val snapshot = firestore.collection(Constants.COLLECTION_POSTS).document(postId)
                 .collection(Constants.COLLECTION_COMMENTS)
                 .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.ASCENDING)
-                .get()
+                .get(com.google.firebase.firestore.Source.SERVER)
                 .await()
 
+            android.util.Log.d("GetComments", "Got ${snapshot.documents.size} documents from Firestore")
+            
             val comments = snapshot.documents.mapNotNull { doc ->
-                doc.toObject(Comment::class.java)?.copy(id = doc.id)
+                // Raw data log
+                val rawData = doc.data
+                android.util.Log.d("GetComments", "Doc ${doc.id} raw data: isDeleted=${rawData?.get("isDeleted")}, deletedBy=${rawData?.get("deletedBy")}")
+                
+                val comment = doc.toObject(Comment::class.java)?.copy(id = doc.id)
+                
+                // Parsed object log
+                android.util.Log.d("GetComments", "Doc ${doc.id} parsed: isDeleted=${comment?.isDeleted}, deletedBy=${comment?.deletedBy}")
+                
+                comment
             }
+            
+            android.util.Log.d("GetComments", "Returning ${comments.size} comments")
             Resource.Success(comments)
         } catch (e: Exception) {
+            android.util.Log.e("GetComments", "Error: ${e.message}")
             Resource.Error(e.message ?: "Yorumlar alınamadı.")
         }
     }
 
     override suspend fun getThreadedComments(postId: String): Resource<List<Comment>> {
         return try {
+            android.util.Log.d("GetThreadedComments", "Fetching threaded comments for postId: $postId")
+            
             val snapshot = firestore.collection(Constants.COLLECTION_POSTS).document(postId)
                 .collection(Constants.COLLECTION_COMMENTS)
                 .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.ASCENDING)
-                .get()
+                .get(com.google.firebase.firestore.Source.SERVER)
                 .await()
 
+            android.util.Log.d("GetThreadedComments", "Got ${snapshot.documents.size} documents from server")
+
             val all = snapshot.documents.mapNotNull { doc ->
-                doc.toObject(Comment::class.java)?.copy(id = doc.id)
+                val data = doc.data ?: return@mapNotNull null
+                
+                // Manuel mapping - toObject() isDeleted alanını düzgün parse etmiyor
+                val comment = Comment(
+                    id = doc.id,
+                    authorId = data["authorId"] as? String ?: "",
+                    authorFullName = data["authorFullName"] as? String ?: "",
+                    authorUsername = data["authorUsername"] as? String ?: "",
+                    authorCity = data["authorCity"] as? String ?: "",
+                    authorDistrict = data["authorDistrict"] as? String ?: "",
+                    authorTitle = data["authorTitle"] as? String ?: "",
+                    text = data["text"] as? String ?: "",
+                    parentCommentId = data["parentCommentId"] as? String,
+                    rootCommentId = data["rootCommentId"] as? String,
+                    depth = (data["depth"] as? Long)?.toInt() ?: 0,
+                    replyCount = data["replyCount"] as? Long ?: 0L,
+                    replyToAuthorId = data["replyToAuthorId"] as? String,
+                    replyToAuthorFullName = data["replyToAuthorFullName"] as? String,
+                    replyToAuthorUsername = data["replyToAuthorUsername"] as? String,
+                    postId = postId,
+                    isDeleted = data["isDeleted"] as? Boolean ?: false,
+                    deletedBy = data["deletedBy"] as? String,
+                    createdAt = (data["createdAt"] as? com.google.firebase.Timestamp)?.toDate()
+                )
+                
+                android.util.Log.d("GetThreadedComments", "Parsed ${doc.id}: isDeleted=${comment.isDeleted}, deletedBy=${comment.deletedBy}")
+                comment
             }
 
             val maxDepth = Constants.MAX_COMMENT_DEPTH
@@ -274,8 +320,10 @@ class PostRepositoryImpl @Inject constructor(
                 appendChildren(c)
             }
 
+            android.util.Log.d("GetThreadedComments", "Returning ${flattened.size} comments")
             Resource.Success(flattened)
         } catch (e: Exception) {
+            android.util.Log.e("GetThreadedComments", "Error: ${e.message}")
             Resource.Error(e.message ?: "Yorumlar alınamadı.")
         }
     }
@@ -299,21 +347,27 @@ class PostRepositoryImpl @Inject constructor(
             val district = profile?.district ?: ""
             val title = profile?.title ?: ""
 
-            val comment = Comment(
-                authorId = user.uid,
-                authorFullName = fullName,
-                authorUsername = username,
-                authorCity = city,
-                authorDistrict = district,
-                authorTitle = title,
-                text = text
+            // Firestore'a yazılacak alanları explicit olarak belirt
+            val commentData = hashMapOf(
+                "authorId" to user.uid,
+                "authorFullName" to fullName,
+                "authorUsername" to username,
+                "authorCity" to city,
+                "authorDistrict" to district,
+                "authorTitle" to title,
+                "text" to text,
+                "parentCommentId" to null,
+                "rootCommentId" to null,
+                "depth" to 0,
+                "replyCount" to 0,
+                "createdAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
             )
 
             val postRef = firestore.collection(Constants.COLLECTION_POSTS).document(postId)
             val commentsCol = postRef.collection(Constants.COLLECTION_COMMENTS)
 
             firestore.runTransaction { tx ->
-                tx.set(commentsCol.document(), comment)
+                tx.set(commentsCol.document(), commentData)
                 tx.update(postRef, "commentCount", FieldValue.increment(1))
             }.await()
 
@@ -373,27 +427,30 @@ class PostRepositoryImpl @Inject constructor(
 
             val replyToUsernameResolved = parent.authorUsername.takeIf { it.isNotBlank() }
 
-            val reply = Comment(
-                authorId = user.uid,
-                authorFullName = fullName,
-                authorUsername = username,
-                authorCity = city,
-                authorDistrict = district,
-                authorTitle = title,
-                text = text,
-                parentCommentId = parent.id,
-                rootCommentId = rootId,
-                depth = parent.depth + 1,
-                replyToAuthorId = replyToAuthorId,
-                replyToAuthorFullName = replyToFullNameResolved,
-                replyToAuthorUsername = replyToUsernameResolved
+            // Firestore'a yazılacak alanları explicit olarak belirt
+            val replyData = hashMapOf<String, Any?>(
+                "authorId" to user.uid,
+                "authorFullName" to fullName,
+                "authorUsername" to username,
+                "authorCity" to city,
+                "authorDistrict" to district,
+                "authorTitle" to title,
+                "text" to text,
+                "parentCommentId" to parent.id,
+                "rootCommentId" to rootId,
+                "depth" to (parent.depth + 1),
+                "replyCount" to 0,
+                "replyToAuthorId" to replyToAuthorId,
+                "replyToAuthorFullName" to replyToFullNameResolved,
+                "replyToAuthorUsername" to replyToUsernameResolved,
+                "createdAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
             )
 
             val rootRef = commentsCol.document(rootId)
 
             firestore.runTransaction { tx ->
                 // reply write
-                tx.set(commentsCol.document(), reply)
+                tx.set(commentsCol.document(), replyData)
                 // denormalized reply count on root comment
                 tx.update(rootRef, "replyCount", FieldValue.increment(1))
                 // denormalized total comment count on post
@@ -421,18 +478,63 @@ class PostRepositoryImpl @Inject constructor(
 
     override suspend fun deletePost(postId: String): Resource<Unit> {
         return try {
-            // 1. Önce Firestore'dan sil
-            firestore.collection(Constants.COLLECTION_POSTS).document(postId).delete().await()
+            // 1. Önce post verisini çek (resim URL'i için)
+            // Hata olsa bile dokümanı silmeye devam edebiliriz, ama resmi silmek için URL lazım.
+            val postSnapshot = firestore.collection(Constants.COLLECTION_POSTS)
+                .document(postId)
+                .get()
+                .await()
+            
+            val imageUrl = postSnapshot.getString("imageUrl")
+            
+            // 2. Eğer resim URL'i varsa Storage'dan sil
+            if (!imageUrl.isNullOrBlank()) {
+                try {
+                    val storageRef = com.google.firebase.storage.FirebaseStorage.getInstance()
+                        .getReferenceFromUrl(imageUrl)
+                    storageRef.delete().await()
+                } catch (e: Exception) {
+                    // Resim silinirken hata oluşursa logla ama postu silmeye devam et
+                    e.printStackTrace()
+                }
+            }
 
-            // 2. (Opsiyonel ama iyi olur) Storage'dan resmi de silmek gerekir.
-            // Bunun için postu çekerken imagePath'i de kaydetmemiz gerekirdi.
-            // Şimdilik sadece veritabanından silelim, storage temizliği ilerde yapılır.
-
+            // 3. Firestore dokümanını sil
+            firestore.collection(Constants.COLLECTION_POSTS)
+                .document(postId)
+                .delete()
+                .await()
+            
             Resource.Success(Unit)
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Silme başarısız.")
+            Resource.Error(e.message ?: "Post silinemedi.")
         }
     }
+    
+    override suspend fun deleteComment(postId: String, commentId: String, isAdmin: Boolean): Resource<Unit> {
+        return try {
+            val postRef = firestore.collection(Constants.COLLECTION_POSTS).document(postId)
+            val commentRef = postRef.collection(Constants.COLLECTION_COMMENTS).document(commentId)
+            
+            // Sadece admin rolü için "admin" yaz, official dahil diğerleri "user" olsun
+            val deletedBy = if (isAdmin) "admin" else "user"
+            
+            // Soft delete: isDeleted=true yap ve commentCount'u azalt
+            firestore.runTransaction { tx ->
+                // Yorum güncelle
+                tx.update(commentRef, mapOf(
+                    "isDeleted" to true,
+                    "deletedBy" to deletedBy
+                ))
+                // Post'un commentCount'unu azalt
+                tx.update(postRef, "commentCount", FieldValue.increment(-1))
+            }.await()
+            
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Yorum silinemedi.")
+        }
+    }    
 
     override suspend fun getUserPosts(userId: String): Resource<List<Post>> {
         return try {
@@ -480,11 +582,35 @@ class PostRepositoryImpl @Inject constructor(
             val snapshot = firestore.collectionGroup(Constants.COLLECTION_COMMENTS)
                 .whereEqualTo("authorId", userId)
                 .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
-                .get()
+                .get(com.google.firebase.firestore.Source.SERVER)
                 .await()
             
             val comments = snapshot.documents.mapNotNull { doc ->
-                doc.toObject(Comment::class.java)?.copy(id = doc.id)
+                val data = doc.data ?: return@mapNotNull null
+                val parentPostId = doc.reference.parent.parent?.id ?: ""
+                
+                // Manuel mapping - toObject() isDeleted alanını düzgün parse etmiyor
+                Comment(
+                    id = doc.id,
+                    authorId = data["authorId"] as? String ?: "",
+                    authorFullName = data["authorFullName"] as? String ?: "",
+                    authorUsername = data["authorUsername"] as? String ?: "",
+                    authorCity = data["authorCity"] as? String ?: "",
+                    authorDistrict = data["authorDistrict"] as? String ?: "",
+                    authorTitle = data["authorTitle"] as? String ?: "",
+                    text = data["text"] as? String ?: "",
+                    parentCommentId = data["parentCommentId"] as? String,
+                    rootCommentId = data["rootCommentId"] as? String,
+                    depth = (data["depth"] as? Long)?.toInt() ?: 0,
+                    replyCount = data["replyCount"] as? Long ?: 0L,
+                    replyToAuthorId = data["replyToAuthorId"] as? String,
+                    replyToAuthorFullName = data["replyToAuthorFullName"] as? String,
+                    replyToAuthorUsername = data["replyToAuthorUsername"] as? String,
+                    postId = parentPostId,
+                    isDeleted = data["isDeleted"] as? Boolean ?: false,
+                    deletedBy = data["deletedBy"] as? String,
+                    createdAt = (data["createdAt"] as? com.google.firebase.Timestamp)?.toDate()
+                )
             }
             Resource.Success(comments)
         } catch (e: Exception) {

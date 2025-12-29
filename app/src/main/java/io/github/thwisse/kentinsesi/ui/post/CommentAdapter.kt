@@ -17,7 +17,8 @@ import java.util.Locale
 
 class CommentAdapter(
     private val onCommentClick: ((Comment) -> Unit)? = null,
-    private val onRepliesToggleClick: ((Comment) -> Unit)? = null
+    private val onRepliesToggleClick: ((Comment) -> Unit)? = null,
+    private val onCommentLongClick: ((Comment) -> Unit)? = null
 ) : ListAdapter<Comment, CommentAdapter.CommentViewHolder>(CommentDiffCallback()) {
 
     private var expandedCommentIds: Set<String> = emptySet()
@@ -45,6 +46,8 @@ class CommentAdapter(
     inner class CommentViewHolder(private val binding: ItemCommentBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(comment: Comment) {
             val context = binding.root.context
+            
+            // Yazar bilgisi
             val fullName = comment.authorFullName.ifBlank {
                 context.getString(io.github.thwisse.kentinsesi.R.string.anonymous_user)
             }
@@ -54,21 +57,54 @@ class CommentAdapter(
             } else {
                 fullName
             }
-            binding.tvCommentText.text = comment.text
 
+            // Metin ve Silindi Durumu Kontrolü
+            if (comment.isDeleted) {
+                binding.tvCommentText.setTypeface(null, android.graphics.Typeface.ITALIC)
+                binding.tvCommentText.setTextColor(Color.GRAY)
+                
+                binding.tvCommentText.text = if (comment.deletedBy == "admin") {
+                    context.getString(io.github.thwisse.kentinsesi.R.string.comment_deleted_by_admin)
+                } else {
+                    context.getString(io.github.thwisse.kentinsesi.R.string.comment_deleted_by_user)
+                }
+                
+                // Silinmişse yanıtla butonu gizle
+                binding.tvReplyAction.visibility = View.GONE
+                binding.root.setOnLongClickListener(null)
+            } else {
+                binding.tvCommentText.setTypeface(null, android.graphics.Typeface.NORMAL)
+                // Sabit koyu renk kullan - tema rengine güvenme
+                binding.tvCommentText.setTextColor(Color.parseColor("#333333"))
+
+                binding.tvCommentText.text = comment.text
+                
+                // Debug log
+                android.util.Log.d("CommentAdapter", "Comment ID: ${comment.id}, Text: '${comment.text}', isDeleted: ${comment.isDeleted}")
+                
+                // Yanıtla butonu
+                binding.tvReplyAction.visibility = View.VISIBLE
+                
+                // Uzun basma -> Silme
+                binding.root.setOnLongClickListener { 
+                    onCommentLongClick?.invoke(comment)
+                    true
+                }
+            }
+
+            // Konum ve Unvan
             val location = listOf(comment.authorCity, comment.authorDistrict)
                 .filter { it.isNotBlank() }
                 .joinToString("/")
             val title = comment.authorTitle
-
             binding.tvAuthorMeta.text = buildString {
                 if (location.isNotBlank()) append(location)
                 if (location.isNotBlank() && title.isNotBlank()) append(" • ")
                 if (title.isNotBlank()) append(title)
             }.ifBlank { " " }
 
+            // Reply To
             val replyTo = comment.replyToAuthorFullName?.takeIf { it.isNotBlank() }
-
             binding.tvReplyingTo.isVisible = !replyTo.isNullOrBlank()
             binding.tvReplyingTo.text = if (!replyTo.isNullOrBlank()) {
                 context.getString(io.github.thwisse.kentinsesi.R.string.reply_to_person, replyTo)
@@ -76,7 +112,7 @@ class CommentAdapter(
                 ""
             }
 
-            // Tarihi formatla (Örn: 12 May, 14:30)
+            // Tarih
             val date = comment.createdAt
             if (date != null) {
                 val format = SimpleDateFormat("dd MMM, HH:mm", Locale.getDefault())
@@ -85,23 +121,22 @@ class CommentAdapter(
                 binding.tvCommentDate.text = context.getString(io.github.thwisse.kentinsesi.R.string.just_now)
             }
 
+            // Girintileme (Indentation) ve Arka Plan Rengi
             val density = binding.root.resources.displayMetrics.density
-
             val baseHorizontalMargin = if (comment.depth <= 0) 0 else (12 * density).toInt()
             val baseVerticalMargin = (6 * density).toInt()
             val indent = (comment.depth.coerceIn(0, Constants.MAX_COMMENT_DEPTH) * 12 * density).toInt()
-
+            
             val depth = comment.depth.coerceIn(0, 4)
             val bg = when (depth) {
-                0 -> Color.parseColor("#E3F2FD") // pastel mavi
-                1 -> Color.parseColor("#FFEBEE") // pastel kirmizi
-                2 -> Color.parseColor("#E8F5E9") // pastel yesil
-                3 -> Color.parseColor("#F3E5F5") // pastel mor
-                else -> Color.parseColor("#FFFDE7") // pastel sari
+                0 -> Color.parseColor("#E3F2FD")
+                1 -> Color.parseColor("#FFEBEE")
+                2 -> Color.parseColor("#E8F5E9")
+                3 -> Color.parseColor("#F3E5F5")
+                else -> Color.parseColor("#FFFDE7")
             }
             binding.root.setCardBackgroundColor(bg)
 
-            // Kartın kendisini sağa kaydır (kart daha küçük görünür), içerik padding'ini değil.
             val lp = binding.root.layoutParams
             if (lp is MarginLayoutParams) {
                 lp.marginStart = baseHorizontalMargin + indent
@@ -111,28 +146,30 @@ class CommentAdapter(
                 binding.root.layoutParams = lp
             }
 
+            // Alt yorum sayısı toggle
             val count = childCountByParentId[comment.id] ?: 0
-
-            // Sol alanın genişliği sabit kalsın: reply yoksa INVISIBLE (GONE değil)
             binding.tvRepliesToggle.visibility = if (count > 0) View.VISIBLE else View.INVISIBLE
             binding.tvRepliesToggle.text = context.getString(io.github.thwisse.kentinsesi.R.string.replies_count, count)
             binding.tvRepliesToggle.setOnClickListener {
                 if (count > 0) onRepliesToggleClick?.invoke(comment)
             }
 
-            val canReply = comment.depth < Constants.MAX_COMMENT_DEPTH
-
-            // Kart click: aç/kapat
-            binding.root.isEnabled = true
-            binding.root.setOnClickListener {
-                if (count > 0) onRepliesToggleClick?.invoke(comment)
+            // Yanıtla butonu mantığı (silinmemişse)
+            if (!comment.isDeleted) {
+                val canReply = comment.depth < Constants.MAX_COMMENT_DEPTH
+                binding.tvReplyAction.isEnabled = canReply
+                binding.tvReplyAction.alpha = if (canReply) 1f else 0.5f
+                binding.tvReplyAction.setOnClickListener {
+                    if (canReply) onCommentClick?.invoke(comment)
+                }
+            } else {
+                // Silinmişse zaten visible GONE yapıldı, ama yine de listener/enable temizle
+                binding.tvReplyAction.setOnClickListener(null)
             }
 
-            // Alt sağ "Yanıtla": reply mode
-            binding.tvReplyAction.isEnabled = canReply
-            binding.tvReplyAction.alpha = if (canReply) 1f else 0.5f
-            binding.tvReplyAction.setOnClickListener {
-                if (canReply) onCommentClick?.invoke(comment)
+            // Kart click: aç/kapat (her durumda çalışsın)
+            binding.root.setOnClickListener {
+                if (count > 0) onRepliesToggleClick?.invoke(comment)
             }
         }
     }

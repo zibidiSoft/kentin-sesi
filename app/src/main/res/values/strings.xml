@@ -74,4 +74,9 @@
     <!-- Profile tabs -->
     <string name="my_posts">Paylaşımlarım</string>
     <string name="my_comments">Yorumlarım</string>
+
+    <string name="comment_deleted_by_user">Bu yorum kullanıcı tarafından silindi.</string>
+    <string name="comment_deleted_by_admin">Bu yorum yönetici tarafından silindi.</string>
+    <string name="dialog_delete_comment_title">Yorumu Sil</string>
+    <string name="dialog_delete_comment_message">Bu yorumun içeriği silinecek. Emin misiniz?</string>
 </resources>

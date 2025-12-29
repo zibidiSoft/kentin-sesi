@@ -81,7 +81,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     /**
-     * Kullanıcının yaptığı tüm yorumları yükle
+     * Kullanıcının yaptığı tüm yorumları yükle (silinen yorumlar hariç)
      */
     fun loadUserComments() {
         val userId = currentUser?.uid ?: return
@@ -89,7 +89,14 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             _userComments.value = Resource.Loading()
             val result = postRepository.getUserComments(userId)
-            _userComments.value = result
+            
+            // Profilde silinen yorumları gösterme
+            if (result is Resource.Success) {
+                val filteredComments = result.data?.filter { !it.isDeleted } ?: emptyList()
+                _userComments.value = Resource.Success(filteredComments)
+            } else {
+                _userComments.value = result
+            }
         }
     }
     
@@ -100,6 +107,26 @@ class ProfileViewModel @Inject constructor(
         loadUserProfile()
         loadUserPosts()
         loadUserComments()
+    }
+    
+    fun deleteComment(comment: Comment) {
+        val user = currentUser
+        if (user == null || comment.postId.isBlank()) return
+        
+        viewModelScope.launch {
+            // Sadece admin rolü için isAdmin true olmalı
+            val currentUserRole = _userProfile.value?.data?.role
+            val isAdmin = currentUserRole == "admin"
+            
+            val result = postRepository.deleteComment(comment.postId, comment.id, isAdmin)
+            
+            if (result is Resource.Success) {
+                // Başarılıysa listeyi yenile
+                loadUserComments()
+            } else {
+                // Hata mesajı gösterilebilir (UI observe etmeli veya tek seferlik event)
+            }
+        }
     }
 
     fun signOut() {
