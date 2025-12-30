@@ -40,9 +40,9 @@
         <item name="textInputStyle">@style/Ant.Input</item>
         <item name="materialAlertDialogTheme">@style/Ant.AlertDialog</item>
         
-        <!-- Status Bar -->
-        <item name="android:statusBarColor">@color/colorBackground</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <!-- System Bars (edge-to-edge: status bar is drawn by AppBarLayout background) -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
 
     </style>
 

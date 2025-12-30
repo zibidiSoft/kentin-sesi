@@ -49,11 +49,11 @@
     <color name="statusRejected">#FF4D4F</color>
 
     <!-- Nested Comment Backgrounds (Dark) -->
-    <!-- Subtle variations of dark gray/green to distinguish layers without blinding -->
-    <color name="color_comment_bg_0">#1A1A1A</color>
-    <color name="color_comment_bg_1">#242424</color>
-    <color name="color_comment_bg_2">#1F2923</color> <!-- Slight Green Tint -->
-    <color name="color_comment_bg_3">#2E2E2E</color>
-    <color name="color_comment_bg_4">#1A1A1A</color>
-    <color name="colorCommentText">#E6E6E6</color>
+    <!-- Daha belirgin katman renkleri (okunabilir, koyu tonlu) -->
+    <color name="color_comment_bg_0">#133C6B</color> <!-- Koyu mavi -->
+    <color name="color_comment_bg_1">#5C1F2B</color> <!-- Koyu kırmızı/şarap -->
+    <color name="color_comment_bg_2">#1C4D34</color> <!-- Koyu yeşil -->
+    <color name="color_comment_bg_3">#3F2A5C</color> <!-- Koyu mor -->
+    <color name="color_comment_bg_4">#6B5A21</color> <!-- Koyu sarı/altın -->
+    <color name="colorCommentText">#FFFFFF</color>
 </resources>
