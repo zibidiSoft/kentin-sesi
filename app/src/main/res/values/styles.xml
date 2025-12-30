@@ -6,7 +6,7 @@
     
     <!-- ========== BUTTONS ========== -->
     
-    <style name="Ant.Button.Primary" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+    <style name="Ant.Button.Primary" parent="Widget.Material3.Button">
         <item name="cornerRadius">@dimen/radius_capsule</item>
         <item name="android:minHeight">@dimen/height_button</item>
         <item name="android:textAllCaps">false</item>
@@ -17,7 +17,7 @@
         <item name="backgroundTint">?attr/colorPrimary</item>
     </style>
     
-    <style name="Ant.Button.Default" parent="Widget.MaterialComponents.Button.OutlinedButton">
+    <style name="Ant.Button.Default" parent="Widget.Material3.Button.OutlinedButton">
         <item name="cornerRadius">@dimen/radius_capsule</item>
         <item name="android:minHeight">@dimen/height_button</item>
         <item name="android:textAllCaps">false</item>
@@ -76,5 +76,28 @@
         <item name="android:fontFamily">@font/inter</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/colorTextSecondary</item>
+    </style>
+
+    <style name="Ant.Button.Text" parent="Widget.Material3.Button.TextButton">
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <!-- ========== DIALOGS ========== -->
+
+    <style name="Ant.AlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <!-- Minimal config to avoid InflateException (layout_width missing) -->
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="shapeAppearanceOverlay">@style/Ant.Shape.Card</item>
+        
+        <!-- Button styles removed to let Material3 handle layout params correctly. 
+             Primary color and font are inherited from the global theme anyway. -->
+    </style>
+    
+    <style name="Ant.Shape.Card" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/radius_m</item>
     </style>
 </resources>

@@ -9,6 +9,17 @@
     <color name="colorPrimary">#00965E</color>
     <color name="colorPrimaryVariant">#007A4D</color>
     <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorPrimaryContainer">#004D2C</color> <!-- Dark Mint -->
+    <color name="colorOnPrimaryContainer">#E6F7EF</color> <!-- Light Mint Text -->
+    
+    <color name="colorSecondary">#00965E</color>
+    <color name="colorOnSecondary">#FFFFFF</color>
+    <color name="colorSecondaryContainer">#004D2C</color>
+    <color name="colorOnSecondaryContainer">#E6F7EF</color>
+    <color name="colorTertiary">#00965E</color>
+    <color name="colorOnTertiary">#FFFFFF</color>
+    <color name="colorTertiaryContainer">#004D2C</color>
+    <color name="colorOnTertiaryContainer">#E6F7EF</color>
     
     <!-- Neutral - Backgrounds (AMOLED Black) -->
     <color name="colorBackground">#000000</color>

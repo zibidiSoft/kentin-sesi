@@ -47,7 +47,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="24sp"
                     android:textStyle="bold"
-                    android:textColor="@color/black"
+                    android:textColor="@color/colorTextPrimary"
                     tools:text="Büyük Çukur Sorunu" />
 
                 <TextView
@@ -55,7 +55,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:textColor="#777"
+                    android:textColor="@color/colorTextSecondary"
                     android:textSize="12sp"
                     tools:text="27 Ara 2025, 15:22" />
 
@@ -82,7 +82,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:gravity="center_vertical"
-                        android:textColor="#666"
+                        android:textColor="@color/colorTextSecondary"
                         tools:text="İskenderun" />
 
                     <TextView
@@ -91,7 +91,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:gravity="center_vertical"
-                        android:textColor="#666"
+                        android:textColor="@color/colorTextSecondary"
                         tools:text="Yeni" />
                 </LinearLayout>
 
@@ -123,7 +123,7 @@
                     android:layout_marginTop="24dp"
                     android:text="@string/post_detail_description"
                     android:textStyle="bold"
-                    android:textColor="@color/black"/>
+                    android:textColor="@color/colorTextPrimary"/>
 
                 <TextView
                     android:id="@+id/tvDetailDescription"
@@ -167,7 +167,7 @@
                             android:id="@+id/tvPostAuthorFullName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/black"
+                            android:textColor="@color/colorTextPrimary"
                             android:textStyle="bold"
                             tools:text="Ahmet Yılmaz" />
 
@@ -176,7 +176,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:textColor="#666"
+                            android:textColor="@color/colorTextSecondary"
                             android:textSize="12sp"
                             tools:text="kullaniciadi" />
 
@@ -185,7 +185,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:textColor="#666"
+                            android:textColor="@color/colorTextSecondary"
                             android:textSize="12sp"
                             tools:text="Hatay/İskenderun • Duyarlı Vatandaş" />
 
@@ -217,7 +217,7 @@
                             android:layout_weight="1"
                             android:text="@string/status_updates"
                             android:textStyle="bold"
-                            android:textColor="@color/black"
+                            android:textColor="@color/colorTextPrimary"
                             android:textSize="16sp" />
 
                     </LinearLayout>
@@ -245,7 +245,7 @@
                             android:layout_weight="1"
                             android:text="@string/comments_header_initial"
                             android:textStyle="bold"
-                            android:textColor="@color/black"
+                            android:textColor="@color/colorTextPrimary"
                             android:textSize="16sp" />
 
                     </LinearLayout>

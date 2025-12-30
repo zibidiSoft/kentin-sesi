@@ -60,7 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:textColor="@color/black"
+                android:textColor="@color/colorTextPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 tools:text="Yol Çökmesi Hakkında" />
@@ -70,7 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textColor="#666666"
+                android:textColor="@color/colorTextSecondary"
                 android:textSize="13sp"
                 tools:text="Hatay, İskenderun" />
 
@@ -100,7 +100,7 @@
                     android:layout_toEndOf="@id/tvUpvoteCount"
                     android:layout_marginStart="12dp"
                     android:layout_centerVertical="true"
-                    android:textColor="#666666"
+                    android:textColor="@color/colorTextSecondary"
                     android:textStyle="bold"
                     tools:text="15 Yorum" />
 
@@ -111,7 +111,7 @@
                     android:layout_toEndOf="@id/tvCommentCount"
                     android:layout_marginStart="12dp"
                     android:layout_centerVertical="true"
-                    android:textColor="#666666"
+                    android:textColor="@color/colorTextSecondary"
                     android:textStyle="bold"
                     tools:text="3 Güncelleme" />
 
@@ -121,7 +121,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:textColor="#999999"
+                    android:textColor="@color/colorTextTertiary"
                     android:textSize="12sp"
                     tools:text="2 saat önce" />
 

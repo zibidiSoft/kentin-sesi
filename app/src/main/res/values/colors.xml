@@ -9,6 +9,17 @@
     <color name="colorPrimary">#00B96B</color>
     <color name="colorPrimaryVariant">#009456</color>
     <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorPrimaryContainer">#E6F7EF</color> <!-- Light Mint -->
+    <color name="colorOnPrimaryContainer">#004D2C</color> <!-- Dark Mint -->
+    
+    <color name="colorSecondary">#00B96B</color> <!-- Use Primary as Secondary for simplicity -->
+    <color name="colorOnSecondary">#FFFFFF</color>
+    <color name="colorSecondaryContainer">#E6F7EF</color>
+    <color name="colorOnSecondaryContainer">#004D2C</color>
+    <color name="colorTertiary">#00B96B</color> <!-- Avoid default M3 Pink/Yellow -->
+    <color name="colorOnTertiary">#FFFFFF</color>
+    <color name="colorTertiaryContainer">#E6F7EF</color>
+    <color name="colorOnTertiaryContainer">#004D2C</color>
     
     <!-- Neutral - Backgrounds -->
     <color name="colorBackground">#F5F5F5</color>

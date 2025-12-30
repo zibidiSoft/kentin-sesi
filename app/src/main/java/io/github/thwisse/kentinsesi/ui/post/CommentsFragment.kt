@@ -207,7 +207,7 @@ class CommentsFragment : Fragment(R.layout.fragment_comments) {
     }
 
     private fun showDeleteCommentDialog(comment: Comment) {
-        android.app.AlertDialog.Builder(requireContext())
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.dialog_delete_comment_title)
             .setMessage(R.string.dialog_delete_comment_message)
             .setPositiveButton("Sil") { _, _ ->

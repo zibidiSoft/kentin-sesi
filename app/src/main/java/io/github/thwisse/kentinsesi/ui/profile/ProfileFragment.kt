@@ -115,7 +115,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val values = arrayOf(LocaleHelper.LANGUAGE_SYSTEM, LocaleHelper.LANGUAGE_TURKISH, LocaleHelper.LANGUAGE_ENGLISH)
         val checkedIndex = values.indexOf(currentLanguage).takeIf { it >= 0 } ?: 0
 
-        AlertDialog.Builder(requireContext())
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.language_select_title))
             .setSingleChoiceItems(options, checkedIndex) { dialog, which ->
                 val selected = values.getOrNull(which) ?: LocaleHelper.LANGUAGE_SYSTEM
@@ -140,7 +140,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val values = arrayOf("system", "light", "dark")
         val checkedIndex = values.indexOf(current).takeIf { it >= 0 } ?: 0
 
-        AlertDialog.Builder(requireContext())
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.theme_select_title))
             .setSingleChoiceItems(options, checkedIndex) { dialog, which ->
                 val selected = values.getOrNull(which) ?: "system"
@@ -271,7 +271,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     }
 
     private fun showDeleteCommentDialog(comment: Comment) {
-        AlertDialog.Builder(requireContext())
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.dialog_delete_comment_title)
             .setMessage(R.string.dialog_delete_comment_message)
             .setPositiveButton("Sil") { _, _ ->
