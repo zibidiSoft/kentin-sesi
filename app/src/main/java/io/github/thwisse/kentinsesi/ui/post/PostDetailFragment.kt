@@ -373,10 +373,19 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
                 format.format(date)
             } ?: ""
 
+            // Durum metni ve rengi
+            val statusColorRes = when (post.statusEnum) {
+                PostStatus.NEW -> io.github.thwisse.kentinsesi.R.color.statusNew
+                PostStatus.IN_PROGRESS -> io.github.thwisse.kentinsesi.R.color.statusInProgress
+                PostStatus.RESOLVED -> io.github.thwisse.kentinsesi.R.color.statusResolved
+                PostStatus.REJECTED -> io.github.thwisse.kentinsesi.R.color.statusRejected
+            }
+            tvDetailStatus.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), statusColorRes))
+
             tvDetailStatus.text = when (post.statusEnum) {
-                PostStatus.NEW -> "Yeni"
-                PostStatus.IN_PROGRESS -> "İşlemde"
-                PostStatus.RESOLVED -> "Çözüldü"
+                PostStatus.NEW -> getString(R.string.post_status_new)
+                PostStatus.IN_PROGRESS -> getString(R.string.post_status_in_progress)
+                PostStatus.RESOLVED -> getString(R.string.post_status_resolved)
                 PostStatus.REJECTED -> "Reddedildi"
             }
 

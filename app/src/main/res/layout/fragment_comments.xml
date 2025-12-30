@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:padding="16dp"
+            android:padding="@dimen/spacing_l"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="3"
             tools:listitem="@layout/item_comment" />
@@ -65,9 +65,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="#FFFFFF"
-        android:elevation="16dp"
+        android:elevation="@dimen/elevation_card"
         android:orientation="horizontal"
-        android:padding="12dp"
+        android:padding="@dimen/spacing_m"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -78,11 +78,13 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/bg_category_tag"
+            android:backgroundTint="@color/colorSurfaceVariant"
             android:hint="@string/comment_write_hint"
             android:importantForAutofill="no"
             android:inputType="textMultiLine"
             android:maxLines="3"
-            android:padding="12dp"
+            android:minHeight="@dimen/height_input"
+            android:padding="@dimen/spacing_m"
             android:textSize="14sp" />
 
         <ImageButton

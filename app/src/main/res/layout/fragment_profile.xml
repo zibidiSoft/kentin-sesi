@@ -16,12 +16,11 @@
 
     <TextView
         android:id="@+id/tvUserName"
+        style="@style/AntTextH1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="@dimen/spacing_xl"
         android:textColor="@color/white"
-        android:textSize="18sp"
-        android:textStyle="bold"
         tools:text="Kullanıcı Adı"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -29,11 +28,11 @@
 
     <TextView
         android:id="@+id/tvUserUsername"
+        style="@style/AntTextBody1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="@dimen/spacing_xs"
         android:textColor="@color/white"
-        android:textSize="14sp"
         tools:text="kullaniciadi"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,11 +40,11 @@
 
     <TextView
         android:id="@+id/tvUserEmail"
+        style="@style/AntTextBody1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="@dimen/spacing_xs"
         android:textColor="@color/white"
-        android:textSize="14sp"
         tools:text="kullanici@mail.com"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -53,31 +52,30 @@
 
     <TextView
         android:id="@+id/tvUserLocation"
+        style="@style/AntTextCaption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="@dimen/spacing_xs"
         android:textColor="@color/white"
-        android:textSize="12sp"
         tools:text="Hatay, İskenderun"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvUserEmail" />
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/cvStats"
+        style="@style/Ant.Card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="24dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="4dp"
+        android:layout_marginHorizontal="@dimen/spacing_xl"
+        android:layout_marginTop="@dimen/spacing_xl"
         app:layout_constraintTop_toBottomOf="@id/tvUserLocation">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="16dp"
+            android:padding="@dimen/spacing_l"
             android:weightSum="2">
 
             <LinearLayout
@@ -89,10 +87,9 @@
 
                 <TextView
                     android:id="@+id/tvPostCount"
+                    style="@style/AntTextH2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
                     android:textColor="?attr/colorPrimary"
                     tools:text="12" />
 
@@ -100,6 +97,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Paylaşım"
+                    android:textColor="@color/colorTextSecondary"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -112,21 +110,21 @@
 
                 <TextView
                     android:id="@+id/tvResolvedCount"
+                    style="@style/AntTextH2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="#4CAF50"
+                    android:textColor="@color/statusResolved"
                     tools:text="5" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Çözüme Ulaşan"
+                    android:textColor="@color/colorTextSecondary"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- Tab Bar: Paylaşımlarım | Yorumlarım -->
     <LinearLayout

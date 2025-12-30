@@ -18,18 +18,17 @@
         android:textColor="?attr/colorPrimary"
         android:alpha="0.6" />
 
-<androidx.cardview.widget.CardView
+<com.google.android.material.card.MaterialCardView
+    style="@style/Ant.Card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    app:cardElevation="2dp"
-    app:cardCornerRadius="8dp">
+    android:layout_marginBottom="@dimen/spacing_l">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="@dimen/spacing_l">
 
         <!-- Header: Badge + Tarih -->
         <LinearLayout
@@ -91,5 +90,5 @@
 
     </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>
 </LinearLayout>

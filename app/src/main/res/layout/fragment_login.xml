@@ -21,21 +21,20 @@
 
     <TextView
         android:id="@+id/tvGirisYapTitle"
+        style="@style/AntTextH1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="@dimen/spacing_xxl"
         android:text="@string/giris_yap"
-        android:textSize="24sp"
-        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilEmail"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        style="@style/Ant.Input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="@dimen/spacing_xl"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvGirisYapTitle">
@@ -50,10 +49,10 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilPassword"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        style="@style/Ant.Input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/spacing_l"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tilEmail"
@@ -69,9 +68,10 @@
 
     <Button
         android:id="@+id/btnLogin"
+        style="@style/Ant.Button.Primary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="@dimen/spacing_xl"
         android:text="@string/giris_yap"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

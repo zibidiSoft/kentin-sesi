@@ -7,22 +7,19 @@
 
     <TextView
         android:id="@+id/tvTitle"
+        style="@style/AntTextH2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/filter_title"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/cvDistrict"
+        style="@style/Ant.Card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="2dp"
+        android:layout_marginTop="@dimen/spacing_l"
         app:layout_constraintTop_toBottomOf="@id/tvTitle">
 
         <LinearLayout
@@ -56,7 +53,7 @@
                 android:src="@android:drawable/ic_menu_more"
                 app:tint="#666" />
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
     <CheckBox
         android:id="@+id/cbOnlyMyPosts"
@@ -68,13 +65,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/cvCategory"
+        style="@style/Ant.Card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="2dp"
+        android:layout_marginTop="@dimen/spacing_l"
         app:layout_constraintTop_toBottomOf="@id/cvDistrict">
 
         <LinearLayout
@@ -108,15 +104,14 @@
                 android:src="@android:drawable/ic_menu_more"
                 app:tint="#666" />
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/cvStatus"
+        style="@style/Ant.Card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="2dp"
+        android:layout_marginTop="@dimen/spacing_l"
         app:layout_constraintTop_toBottomOf="@id/cvCategory">
 
         <LinearLayout
@@ -150,7 +145,7 @@
                 android:src="@android:drawable/ic_menu_more"
                 app:tint="#666" />
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
     <LinearLayout
         android:id="@+id/layoutFilterActions"
@@ -163,14 +158,16 @@
 
         <Button
             android:id="@+id/btnSavePreset"
+            style="@style/Ant.Button.Default"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="@dimen/spacing_m"
             android:text="@string/filter_save" />
 
         <Button
             android:id="@+id/btnApplyFilter"
+            style="@style/Ant.Button.Primary"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

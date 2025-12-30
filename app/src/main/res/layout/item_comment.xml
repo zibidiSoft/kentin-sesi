@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="@dimen/spacing_m">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -21,6 +21,7 @@
 
             <TextView
                 android:id="@+id/tvAuthorFullName"
+                style="@style/AntTextBody1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -30,10 +31,10 @@
 
             <TextView
                 android:id="@+id/tvCommentDate"
+                style="@style/AntTextCaption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textColor="#777"
+                android:textColor="@color/colorTextSecondary"
                 tools:text="27 Ara, 12:10" />
 
         </LinearLayout>
@@ -59,10 +60,11 @@
 
         <TextView
             android:id="@+id/tvCommentText"
+            style="@style/AntTextBody1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textColor="#444"
+            android:textColor="@color/colorTextPrimary"
             tools:text="Belediyenin bu konuda acil çalışması lazım, geçen gün kaza oluyordu." />
 
         <LinearLayout
