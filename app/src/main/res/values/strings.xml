@@ -61,7 +61,7 @@
 
     <!-- Profile Setup -->
     <string name="setup_profile_title">Complete your profile</string>
-    <string name="setup_profile_subtitle">To provide a better service, we need to know you.</string>
+    <string name="setup_profile_subtitle">We need to know you.</string>
     <string name="setup_profile_full_name_hint">Full name</string>
     <string name="setup_profile_username_hint">Username</string>
     <string name="setup_profile_city_hint">City</string>
@@ -72,8 +72,8 @@
     <string name="profile_save_error">Profile could not be saved</string>
 
     <!-- Profile -->
-    <string name="my_posts">My Posts</string>
-    <string name="my_comments">My Comments</string>
+    <string name="my_posts">Posts</string>
+    <string name="my_comments">Comments</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="no_posts_yet">No posts yet</string>
     <string name="no_comments_yet">No comments yet</string>
@@ -125,8 +125,8 @@
     <string name="comments_header">Comments (%1$d)</string>
     <string name="comments_header_initial">Comments (0)</string>
     <string name="comment_write_hint">Write a comment…</string>
-    <string name="reply_write_hint">Write a reply…</string>
-    <string name="reply_to_person">Reply to %1$s</string>
+    <string name="reply_write_hint">Reply…</string>
+    <string name="reply_to_person">Replied to %1$s</string>
     <string name="replies_count">%1$d replies</string>
     <string name="comment_added">Comment added</string>
     <string name="comment_add_failed">Comment could not be added</string>
@@ -231,7 +231,7 @@
 
     <!-- Dialogs -->
     <string name="dialog_delete_comment_title">Delete Comment</string>
-    <string name="dialog_delete_comment_message">The content of this comment will be deleted. Are you sure?</string>
+    <string name="dialog_delete_comment_message">This comment will be deleted. Are you sure?</string>
 
     <!-- Content Descriptions -->
     <string name="cd_post_image">Post image</string>

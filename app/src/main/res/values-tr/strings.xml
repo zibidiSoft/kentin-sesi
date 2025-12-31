@@ -51,8 +51,8 @@
     <string name="user_data_not_found">Kullanıcı verisi alınamadı.</string>
     <string name="user_session_not_found">Kullanıcı oturumu bulunamadı.</string>
     <string name="sign_out">Çıkış Yap</string>
-    <string name="change_language">Dil Değiştir</string>
-    <string name="admin_panel">Admin Paneli</string>
+    <string name="change_language">Dili Değiştir</string>
+    <string name="admin_panel">Yönetici Paneli</string>
     <string name="theme">Temayı Değiştir</string>
     <string name="theme_system">Sistem</string>
     <string name="theme_light">Açık</string>
@@ -61,7 +61,7 @@
 
     <!-- Profile Setup -->
     <string name="setup_profile_title">Profilini tamamla</string>
-    <string name="setup_profile_subtitle">Daha iyi bir hizmet için seni tanımalıyız.</string>
+    <string name="setup_profile_subtitle">Seni tanımalıyız.</string>
     <string name="setup_profile_full_name_hint">Ad soyad</string>
     <string name="setup_profile_username_hint">Kullanıcı adı</string>
     <string name="setup_profile_city_hint">Şehir</string>
@@ -72,8 +72,8 @@
     <string name="profile_save_error">Profil kaydedilemedi</string>
 
     <!-- Profile -->
-    <string name="my_posts">Paylaşımlarım</string>
-    <string name="my_comments">Yorumlarım</string>
+    <string name="my_posts">Paylaşımlar</string>
+    <string name="my_comments">Yorumlar</string>
     <string name="edit_profile">Profili Düzenle</string>
     <string name="no_posts_yet">Henüz paylaşım yok</string>
     <string name="no_comments_yet">Henüz yorum yok</string>
@@ -87,7 +87,7 @@
     <string name="create_post_district_hint">İlçe</string>
     <string name="create_post_category_hint">Kategori</string>
     <string name="create_post_description_hint">Detaylı açıklama</string>
-    <string name="create_post_location_waiting">Konum: Bekleniyor…</string>
+    <string name="create_post_location_waiting">Konum: bekleniyor…</string>
     <string name="create_post_select_location">Haritadan konum seç</string>
     <string name="create_post_share">Paylaş</string>
     <string name="post_created_success">Paylaşım başarıyla oluşturuldu</string>
@@ -125,8 +125,8 @@
     <string name="comments_header">Yorumlar (%1$d)</string>
     <string name="comments_header_initial">Yorumlar (0)</string>
     <string name="comment_write_hint">Bir yorum yaz…</string>
-    <string name="reply_write_hint">Yanıt yaz…</string>
-    <string name="reply_to_person">%1$s kişisine yanıt</string>
+    <string name="reply_write_hint">Yanıtla…</string>
+    <string name="reply_to_person">%1$s kişisine yanıt verdi</string>
     <string name="replies_count">%1$d yanıt</string>
     <string name="comment_added">Yorum eklendi</string>
     <string name="comment_add_failed">Yorum eklenemedi</string>
@@ -231,7 +231,7 @@
 
     <!-- Dialogs -->
     <string name="dialog_delete_comment_title">Yorumu Sil</string>
-    <string name="dialog_delete_comment_message">Bu yorumun içeriği silinecek. Emin misiniz?</string>
+    <string name="dialog_delete_comment_message">Bu yorum silinecek. Emin misiniz?</string>
 
     <!-- Content Descriptions -->
     <string name="cd_post_image">Paylaşım görseli</string>

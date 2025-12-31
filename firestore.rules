@@ -150,10 +150,8 @@ service cloud.firestore {
                          isOwner(resource.data.authorId) ||
                          // Admin herhangi bir yorumu güncelleyebilir (soft delete için)
                          isAdmin() ||
-                         // Reply atılınca root yorumun replyCount alanı +1 güncellenebilsin
+                         // Reply atılınca herhangi bir yorumun replyCount alanı +1 güncellenebilsin
                          (
-                           // Eski yorumlarda depth alanı olmayabilir => top-level kabul et
-                           (resource.data.depth == 0 || resource.data.depth == null) &&
                            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['replyCount']) &&
                            // replyCount increment için sadece tip kontrolü yapıyoruz
                            request.resource.data.replyCount is int
