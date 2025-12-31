@@ -58,10 +58,10 @@
                             android:id="@+id/tvDetailDate"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-
+                            android:layout_centerVertical="true"
                             android:gravity="center_vertical"
                             android:textColor="@color/colorTextSecondary"
-                            android:textSize="12sp"
+                            android:textSize="13sp"
                             tools:text="27 Ara 2025, 15:22" />
 
                         <TextView
@@ -69,8 +69,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
                             android:gravity="center_vertical"
                             android:textColor="@color/colorTextSecondary"
+                            android:textSize="13sp"
                             tools:text="Yeni" />
 
                     </RelativeLayout>
@@ -87,7 +89,7 @@
 
 
 
-                    <LinearLayout
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
@@ -108,11 +110,24 @@
                             android:id="@+id/tvDetailDistrict"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
+                            android:layout_toEndOf="@+id/tvDetailCategory"
                             android:gravity="center_vertical"
+                            android:layout_centerVertical="true"
+                            android:paddingStart="20dp"
+                            android:textSize="13sp"
                             android:textColor="@color/colorTextSecondary"
                             tools:text="İskenderun" />
-                    </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvDetailDuration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:textColor="@color/colorTextSecondary"
+                            android:layout_centerVertical="true"
+                            android:textSize="13sp"
+                            tools:text="2 saat önce" />
+                    </RelativeLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"

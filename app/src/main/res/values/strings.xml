@@ -141,6 +141,15 @@
     <string name="just_now">Just now</string>
     <string name="anonymous_user">Anonymous</string>
 
+    <!-- Time / Duration -->
+    <string name="time_just_now">Az önce</string>
+    <string name="time_minutes_ago">%d dakika önce</string>
+    <string name="time_hours_ago">%d saat önce</string>
+    <string name="time_days_ago">%d gün önce</string>
+    <string name="time_weeks_ago">%d hafta önce</string>
+    <string name="time_months_ago">%d ay önce</string>
+    <string name="time_years_ago">%d yıl önce</string>
+
     <!-- Status Updates -->
     <string name="status_updates">Status Updates</string>
     <string name="status_updates_count">Updates (%d)</string>

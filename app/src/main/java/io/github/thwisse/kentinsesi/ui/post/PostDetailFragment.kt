@@ -394,6 +394,15 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
             
             // Yorum sayısını güncelle (CommentsFragment'tan döndükten sonra)
             tvCommentsHeader.text = getString(R.string.comments_header, post.commentCount)
+            
+            // Duration (Geçen süre) - resolved postlarda ve null timestamp'te gizli
+            val durationText = io.github.thwisse.kentinsesi.util.TimeUtil.getRelativeTime(post.createdAt, requireContext())
+            if (durationText.isNotEmpty() && post.status != "resolved") {
+                tvDetailDuration.text = durationText
+                tvDetailDuration.visibility = android.view.View.VISIBLE
+            } else {
+                tvDetailDuration.visibility = android.view.View.INVISIBLE
+            }
         }
 
         binding.btnDetailUpvote.setOnClickListener {

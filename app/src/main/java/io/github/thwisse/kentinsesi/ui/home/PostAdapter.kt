@@ -57,6 +57,15 @@ class PostAdapter(
                     crossfade(true)
                     placeholder(android.R.drawable.progress_indeterminate_horizontal)
                 }
+                
+                // Duration (Geçen süre) - resolved postlarda ve null timestamp'te gizli
+                val durationText = io.github.thwisse.kentinsesi.util.TimeUtil.getRelativeTime(post.createdAt, context)
+                if (durationText.isNotEmpty() && post.status != "resolved") {
+                    tvDuration.text = durationText
+                    tvDuration.visibility = android.view.View.VISIBLE
+                } else {
+                    tvDuration.visibility = android.view.View.INVISIBLE
+                }
             }
 
             // Karta (Root View) tıklayınca detay aç
