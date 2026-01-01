@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Ant.Card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="6dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical">
+
+        <!-- Notification Icon/Avatar -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivNotificationIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="12dp"
+            android:background="?attr/colorSurfaceVariant"
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+            tools:src="@drawable/ic_person_placeholder" />
+
+        <!-- Content -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvNotificationTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorTextPrimary"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                tools:text="Ahmet Yılmaz paylaşımınıza yorum yaptı" />
+
+            <TextView
+                android:id="@+id/tvNotificationMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/colorTextSecondary"
+                android:textSize="13sp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                tools:text="Çok haklısınız, bu soruna bir çözüm bulunmalı..." />
+
+            <TextView
+                android:id="@+id/tvNotificationTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/colorTextSecondary"
+                android:textSize="12sp"
+                tools:text="2 saat önce" />
+
+        </LinearLayout>
+
+        <!-- Unread Indicator -->
+        <View
+            android:id="@+id/vUnreadIndicator"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_unread_indicator"
+            android:visibility="visible" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
