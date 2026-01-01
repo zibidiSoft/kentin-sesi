@@ -1,6 +1,7 @@
 package io.github.thwisse.kentinsesi.data.model
 
 import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
 
@@ -27,6 +28,7 @@ data class StatusUpdate(
     val authorCity: String = "",
     val authorDistrict: String = "",
     val authorTitle: String = "",
+    @get:PropertyName("authorAvatarSeed") @set:PropertyName("authorAvatarSeed") var authorAvatarSeed: String = "", // DiceBear avatar seed (denormalized)
     
     @ServerTimestamp
     val createdAt: Date? = null

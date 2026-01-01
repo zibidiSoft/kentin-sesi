@@ -66,16 +66,34 @@
 
         </LinearLayout>
 
-        <!-- Yazar Bilgisi -->
-        <TextView
-            android:id="@+id/tvAuthor"
-            android:layout_width="wrap_content"
+        <!-- Yazar Bilgisi ile Avatar -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:textSize="14sp"
-            android:textColor="?android:textColorPrimary"
-            android:textStyle="bold"
-            tools:text="Ahmet Yılmaz (@ahmet)" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Avatar -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivUpdateAuthorAvatar"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="8dp"
+                android:background="?attr/colorSurfaceVariant"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
+
+            <TextView
+                android:id="@+id/tvAuthor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="?android:textColorPrimary"
+                android:textStyle="bold"
+                tools:text="Ahmet Yılmaz (@ahmet)" />
+
+        </LinearLayout>
 
         <!-- Not İçeriği -->
         <TextView

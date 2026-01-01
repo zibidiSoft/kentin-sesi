@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.github.thwisse.kentinsesi.data.model.StatusUpdate
 import io.github.thwisse.kentinsesi.databinding.ItemStatusUpdateBinding
+import io.github.thwisse.kentinsesi.util.loadAvatar
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -31,6 +32,10 @@ class StatusUpdateAdapter : ListAdapter<StatusUpdate, StatusUpdateAdapter.ViewHo
         private val dateFormat = SimpleDateFormat("EEEE, dd MMM, HH:mm", Locale.getDefault())
 
         fun bind(update: StatusUpdate, position: Int) {
+            // Avatar loading
+            android.util.Log.d("StatusUpdateAdapter", "bind() - update.id=${update.id}, authorAvatarSeed='${update.authorAvatarSeed}'")
+            binding.ivUpdateAuthorAvatar.loadAvatar(update.authorAvatarSeed)
+            
             // Ok işareti - sadece ilk item'dan sonrakiler için göster
             binding.tvTimelineArrow.visibility = if (position == 0) android.view.View.GONE else android.view.View.VISIBLE
             

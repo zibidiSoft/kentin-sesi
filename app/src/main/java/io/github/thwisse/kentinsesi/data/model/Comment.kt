@@ -1,18 +1,20 @@
 package io.github.thwisse.kentinsesi.data.model
 
 import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
 
 data class Comment(
     @DocumentId
-    val id: String = "",
+    var id: String = "",
     val authorId: String = "",
     val authorFullName: String = "",
     val authorUsername: String = "",
     val authorCity: String = "",
     val authorDistrict: String = "",
     val authorTitle: String = "",
+    @get:PropertyName("authorAvatarSeed") @set:PropertyName("authorAvatarSeed") var authorAvatarSeed: String = "", // DiceBear avatar seed (denormalized)
     val text: String = "",
 
     // Reply alanları

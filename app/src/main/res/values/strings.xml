@@ -174,7 +174,7 @@
     <string name="filter_status">Status</string>
     <string name="filter_all">All</string>
     <string name="filter_only_my_posts">Only my posts</string>
-    <string name="filter_save">Save</string>
+    <string name="filter_save">Save to My filters</string>
     <string name="filter_apply">Apply</string>
     <string name="filter_reset">Reset</string>
     <string name="filter_cancel">Cancel</string>

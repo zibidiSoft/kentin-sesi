@@ -37,7 +37,7 @@ service cloud.firestore {
     }
 
     function commentAllowedKeys() {
-      return ['authorId', 'authorFullName', 'authorUsername', 'authorCity', 'authorDistrict', 'authorTitle', 'text', 'parentCommentId', 'rootCommentId', 'depth', 'replyCount', 'replyToAuthorId', 'replyToAuthorFullName', 'replyToAuthorUsername', 'createdAt', 'isDeleted', 'deletedBy', 'postId'];
+      return ['authorId', 'authorFullName', 'authorUsername', 'authorCity', 'authorDistrict', 'authorTitle', 'authorAvatarSeed', 'text', 'parentCommentId', 'rootCommentId', 'depth', 'replyCount', 'replyToAuthorId', 'replyToAuthorFullName', 'replyToAuthorUsername', 'createdAt', 'isDeleted', 'deletedBy', 'postId'];
     }
 
     function hasOnlyCommentAllowedKeys(data) {
@@ -143,6 +143,7 @@ service cloud.firestore {
                          request.resource.data.authorCity is string &&
                          request.resource.data.authorDistrict is string &&
                          request.resource.data.authorTitle is string &&
+                         request.resource.data.authorAvatarSeed is string &&  // EKLENDI
                          request.resource.data.text is string;
         
         // Güncelleme: Yorum sahibi veya admin güncelleyebilir
@@ -181,6 +182,7 @@ service cloud.firestore {
                          'postId', 'status', 'note', 'authorId',
                          'authorFullName', 'authorUsername', 
                          'authorCity', 'authorDistrict', 'authorTitle',
+                         'authorAvatarSeed',  // EKLENDI
                          'createdAt'
                        ]) &&
                        request.resource.data.note is string &&

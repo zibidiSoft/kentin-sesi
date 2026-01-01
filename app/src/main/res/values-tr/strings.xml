@@ -165,7 +165,7 @@
     <string name="filter_status">Durum</string>
     <string name="filter_all">Tümü</string>
     <string name="filter_only_my_posts">Sadece benim paylaşımlarım</string>
-    <string name="filter_save">Kaydet</string>
+    <string name="filter_save">Filtrelerime Kaydet</string>
     <string name="filter_apply">Uygula</string>
     <string name="filter_reset">Sıfırla</string>
     <string name="filter_cancel">İptal</string>

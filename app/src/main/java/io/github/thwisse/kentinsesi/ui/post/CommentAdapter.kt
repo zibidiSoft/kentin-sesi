@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import io.github.thwisse.kentinsesi.data.model.Comment
 import io.github.thwisse.kentinsesi.databinding.ItemCommentBinding
 import io.github.thwisse.kentinsesi.util.Constants
+import io.github.thwisse.kentinsesi.util.loadAvatar
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -46,6 +47,10 @@ class CommentAdapter(
     inner class CommentViewHolder(private val binding: ItemCommentBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(comment: Comment) {
             val context = binding.root.context
+            
+            // Avatar (DiceBear)
+            android.util.Log.d("CommentAdapter", "bind() - comment.id=${comment.id}, authorAvatarSeed='${comment.authorAvatarSeed}'")
+            binding.ivCommentAvatar.loadAvatar(comment.authorAvatarSeed)
             
             // Yazar bilgisi
             val fullName = comment.authorFullName.ifBlank {

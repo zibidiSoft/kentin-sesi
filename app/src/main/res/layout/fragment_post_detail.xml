@@ -204,34 +204,53 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:padding="@dimen/spacing_m">
 
-                        <TextView
-                            android:id="@+id/tvPostAuthorFullName"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/colorTextPrimary"
-                            android:textStyle="bold"
-                            tools:text="Ahmet Yılmaz" />
+                        <!-- Avatar -->
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/ivPostAuthorAvatar"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_marginEnd="12dp"
+                            android:background="?attr/colorSurfaceVariant"
+                            android:scaleType="centerCrop"
+                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
 
-                        <TextView
-                            android:id="@+id/tvPostAuthorUsername"
-                            android:layout_width="match_parent"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:textColor="@color/colorTextSecondary"
-                            android:textSize="12sp"
-                            tools:text="kullaniciadi" />
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-                        <TextView
-                            android:id="@+id/tvPostAuthorMeta"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:textColor="@color/colorTextSecondary"
-                            android:textSize="12sp"
-                            tools:text="Hatay/İskenderun • Duyarlı Vatandaş" />
+                            <TextView
+                                android:id="@+id/tvPostAuthorFullName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/colorTextPrimary"
+                                android:textStyle="bold"
+                                tools:text="Ahmet Yılmaz" />
+
+                            <TextView
+                                android:id="@+id/tvPostAuthorUsername"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textColor="@color/colorTextSecondary"
+                                android:textSize="12sp"
+                                tools:text="kullaniciadi" />
+
+                            <TextView
+                                android:id="@+id/tvPostAuthorMeta"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:textColor="@color/colorTextSecondary"
+                                android:textSize="12sp"
+                                tools:text="Hatay/İskenderun • Duyarlı Vatandaş" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 

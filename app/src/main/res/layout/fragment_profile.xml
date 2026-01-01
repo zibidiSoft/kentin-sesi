@@ -10,8 +10,21 @@
     <View
         android:id="@+id/headerBg"
         android:layout_width="match_parent"
-        android:layout_height="180dp"
+        android:layout_height="290dp"
         android:background="?attr/colorPrimary"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Profile Avatar -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivProfileAvatar"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="@dimen/spacing_m"
+        android:background="?attr/colorSurfaceVariant"
+        android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -19,12 +32,12 @@
         style="@style/AntTextH1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_xl"
+        android:layout_marginTop="@dimen/spacing_s"
         android:textColor="@color/white"
         tools:text="Kullanıcı Adı"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/ivProfileAvatar" />
 
     <TextView
         android:id="@+id/tvUserUsername"

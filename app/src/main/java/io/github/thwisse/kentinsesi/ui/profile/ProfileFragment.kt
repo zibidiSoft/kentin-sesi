@@ -26,6 +26,7 @@ import io.github.thwisse.kentinsesi.ui.AuthActivity
 import io.github.thwisse.kentinsesi.ui.home.PostAdapter
 import io.github.thwisse.kentinsesi.util.Resource
 import io.github.thwisse.kentinsesi.util.LocaleHelper
+import io.github.thwisse.kentinsesi.util.loadAvatar
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
@@ -185,6 +186,9 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
                         // Kullanıcı adını göster
                         binding.tvUserName.text = user.fullName.ifEmpty { "İsim Belirtilmemiş" }
+                        
+                        // Avatar yükle
+                        binding.ivProfileAvatar.loadAvatar(user.avatarSeed)
 
                         val username = user.username.trim().takeIf { it.isNotBlank() }
                         binding.tvUserUsername.visibility = if (username != null) {

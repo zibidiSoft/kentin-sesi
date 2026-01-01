@@ -265,7 +265,8 @@ class PostRepositoryImpl @Inject constructor(
                 val rawData = doc.data
                 android.util.Log.d("GetComments", "Doc ${doc.id} raw data: isDeleted=${rawData?.get("isDeleted")}, deletedBy=${rawData?.get("deletedBy")}")
                 
-                val comment = doc.toObject(Comment::class.java)?.copy(id = doc.id)
+                val comment = doc.toObject(Comment::class.java)
+                comment?.id = doc.id  // Manually set ID instead of using copy()
                 
                 // Parsed object log
                 android.util.Log.d("GetComments", "Doc ${doc.id} parsed: isDeleted=${comment?.isDeleted}, deletedBy=${comment?.deletedBy}")
@@ -375,6 +376,10 @@ class PostRepositoryImpl @Inject constructor(
             val city = profile?.city ?: ""
             val district = profile?.district ?: ""
             val title = profile?.title ?: ""
+            val avatarSeed = profile?.avatarSeed ?: "" // Avatar seed (denormalized)
+            
+            // DEBUG: Avatar seed kontrolü
+            android.util.Log.d("PostRepository", "addComment - avatarSeed from profile: '$avatarSeed', profile null: ${profile == null}")
 
             // Firestore'a yazılacak alanları explicit olarak belirt
             val commentData = hashMapOf(
@@ -384,6 +389,7 @@ class PostRepositoryImpl @Inject constructor(
                 "authorCity" to city,
                 "authorDistrict" to district,
                 "authorTitle" to title,
+                "authorAvatarSeed" to avatarSeed, // EKLENDI
                 "text" to text,
                 "parentCommentId" to null,
                 "rootCommentId" to null,
@@ -429,6 +435,10 @@ class PostRepositoryImpl @Inject constructor(
             val city = profile?.city ?: ""
             val district = profile?.district ?: ""
             val title = profile?.title ?: ""
+            val avatarSeed = profile?.avatarSeed ?: "" // Avatar seed (denormalized)
+            
+            // DEBUG: Avatar seed kontrolü
+            android.util.Log.d("PostRepository", "addReply - avatarSeed from profile: '$avatarSeed', profile null: ${profile == null}")
 
             val postRef = firestore.collection(Constants.COLLECTION_POSTS).document(postId)
             val commentsCol = postRef.collection(Constants.COLLECTION_COMMENTS)
@@ -466,6 +476,7 @@ class PostRepositoryImpl @Inject constructor(
                 "authorCity" to city,
                 "authorDistrict" to district,
                 "authorTitle" to title,
+                "authorAvatarSeed" to avatarSeed, // EKLENDI
                 "text" to text,
                 "parentCommentId" to parent.id,
                 "rootCommentId" to rootId,
@@ -722,8 +733,12 @@ class PostRepositoryImpl @Inject constructor(
                 "authorCity" to (profile?.city ?: ""),
                 "authorDistrict" to (profile?.district ?: ""),
                 "authorTitle" to (profile?.title ?: ""),
+                "authorAvatarSeed" to (profile?.avatarSeed ?: ""), // EKLENDI
                 "createdAt" to FieldValue.serverTimestamp()
             )
+            
+            // DEBUG: Avatar seed kontrolü
+            android.util.Log.d("PostRepository", "addStatusUpdate - avatarSeed: '${profile?.avatarSeed}', profile null: ${profile == null}")
             
             // Transaction: StatusUpdate ekle + Post status ve updateCount güncelle
             firestore.runTransaction { transaction ->

@@ -18,6 +18,7 @@ import io.github.thwisse.kentinsesi.databinding.FragmentPostDetailBinding
 import io.github.thwisse.kentinsesi.data.model.Comment
 import io.github.thwisse.kentinsesi.util.Resource
 import io.github.thwisse.kentinsesi.util.ValidationUtils
+import io.github.thwisse.kentinsesi.util.loadAvatar
 import androidx.core.view.isVisible
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -102,6 +103,7 @@ class PostDetailFragment : Fragment(io.github.thwisse.kentinsesi.R.layout.fragme
                 binding.cardPostAuthor.isVisible = false
             } else {
                 binding.cardPostAuthor.isVisible = true
+                binding.ivPostAuthorAvatar.loadAvatar(author.avatarSeed)
                 binding.tvPostAuthorFullName.text = author.fullName.ifBlank { "-" }
 
                 val username = author.username.trim().takeIf { it.isNotBlank() }
